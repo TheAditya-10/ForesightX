@@ -1,0 +1,22 @@
+Project goal
+
+Build a production-ready system that ingests market & alternative data, trains and backtests a suite of time-series and ML models, 
+serves predictions (point + interval) via REST, automatically retrains when needed, monitors data/model health and shows 
+interactive explanations & dashboards on nwebsite.
+
+
+OK so first we will make few notebooks to get full picture and then we will make whole app with deployment. 
+So we have different stages in ml project that are
+- Data Ingestion 
+- EDA
+- Pre-processing
+- Feature Engg & Feature Selections
+- Model Training 
+- Model Eval
+
+- Data Ingestion 
+
+ok then we will go and create notebook cells for each step one by one 
+first data ingestion  we want the latest as long possible historical data to train model of any stock. 
+and then it will predict for the next day. so write a cell for data injection
+
