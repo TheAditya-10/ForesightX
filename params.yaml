@@ -1,0 +1,257 @@
+# ForesightX Parameters
+# ======================
+# Centralized configuration for all ML pipeline stages
+
+# Data Ingestion Configuration
+data_ingestion:
+  stock_symbol: AAPL
+  start_date: '2015-01-01'
+  end_date: '2023-12-31'
+  source: yfinance  # Options: yfinance, alpha_vantage, csv
+  api_key: null  # Required for alpha_vantage
+
+# Data Preprocessing Configuration
+preprocessing:
+  handle_missing: ffill  # Options: ffill, bfill, interpolate, drop
+  remove_outliers: true
+  outlier_method: iqr  # Options: iqr, zscore
+  outlier_threshold: 3.0
+  validate_data: true
+  min_trading_days: 252  # Minimum trading days required
+
+# Feature Engineering Configuration
+feature_engineering:
+  # Technical Indicators
+  technical_indicators:
+    - SMA_20
+    - SMA_50
+    - SMA_200
+    - EMA_12
+    - EMA_26
+    - RSI_14
+    - MACD
+    - MACD_signal
+    - Bollinger_upper
+    - Bollinger_lower
+    - ATR_14
+    - ADX_14
+    - Stochastic_K
+    - Stochastic_D
+  
+  # Lag Features
+  lag_features:
+    enabled: true
+    lag_periods: [1, 2, 3, 5, 10]
+    columns: ['Close', 'Volume', 'RSI_14']
+  
+  # Moving Averages
+  moving_averages:
+    windows: [5, 10, 20, 50, 100, 200]
+    type: sma  # Options: sma, ema, wma
+  
+  # Volatility Features
+  volatility_features:
+    enabled: true
+    rolling_std_window: 20
+    historical_volatility_window: 30
+
+# Training Configuration
+training:
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+  sequence_length: 60  # For deep learning models
+  batch_size: 32
+  epochs: 100
+  early_stopping_patience: 10
+  learning_rate: 0.001
+
+# Model Hyperparameters
+
+# Classical Time Series Models
+models:
+  # ARIMA/SARIMAX
+  arima:
+    order: [5, 1, 0]
+    seasonal_order: [1, 1, 1, 12]
+    trend: 'ct'
+  
+  # Prophet
+  prophet:
+    changepoint_prior_scale: 0.05
+    seasonality_prior_scale: 10.0
+    seasonality_mode: 'multiplicative'
+    yearly_seasonality: true
+    weekly_seasonality: true
+    daily_seasonality: false
+  
+  # XGBoost
+  xgboost:
+    n_estimators: 1000
+    max_depth: 7
+    learning_rate: 0.01
+    subsample: 0.8
+    colsample_bytree: 0.8
+    gamma: 0.1
+    min_child_weight: 3
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+    objective: 'reg:squarederror'
+    eval_metric: 'rmse'
+    early_stopping_rounds: 50
+    verbosity: 0
+  
+  # LightGBM
+  lightgbm:
+    n_estimators: 1000
+    num_leaves: 31
+    max_depth: 7
+    learning_rate: 0.01
+    subsample: 0.8
+    colsample_bytree: 0.8
+    min_child_samples: 20
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+    objective: 'regression'
+    metric: 'rmse'
+    boosting_type: 'gbdt'
+    verbose: -1
+    early_stopping_rounds: 50
+  
+  # MLP (Multi-Layer Perceptron)
+  mlp:
+    hidden_layer_sizes: [100, 50, 25]
+    activation: 'relu'
+    solver: 'adam'
+    alpha: 0.0001
+    batch_size: 32
+    learning_rate: 'adaptive'
+    learning_rate_init: 0.001
+    max_iter: 500
+    early_stopping: true
+    validation_fraction: 0.1
+    n_iter_no_change: 20
+    random_state: 42
+  
+  # LSTM (PyTorch)
+  lstm:
+    input_size: 20  # Number of features
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: false
+    output_size: 1
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    optimizer: 'adam'
+    scheduler: 'ReduceLROnPlateau'
+    scheduler_params:
+      mode: 'min'
+      factor: 0.5
+      patience: 5
+      min_lr: 0.00001
+  
+  # GRU (PyTorch)
+  gru:
+    input_size: 20
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: false
+    output_size: 1
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    optimizer: 'adam'
+    scheduler: 'ReduceLROnPlateau'
+    scheduler_params:
+      mode: 'min'
+      factor: 0.5
+      patience: 5
+      min_lr: 0.00001
+  
+  # Transformer (PyTorch)
+  transformer:
+    input_size: 20
+    d_model: 128
+    nhead: 8
+    num_encoder_layers: 3
+    dim_feedforward: 512
+    dropout: 0.2
+    output_size: 1
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    optimizer: 'adam'
+    scheduler: 'ReduceLROnPlateau'
+    scheduler_params:
+      mode: 'min'
+      factor: 0.5
+      patience: 5
+      min_lr: 0.00001
+
+# Ensemble Configuration
+ensemble:
+  method: 'weighted_average'  # Options: weighted_average, stacking, voting
+  top_n_models: 5  # Select top N models based on validation performance
+  weights: 'auto'  # Options: auto (based on performance), equal, custom
+  custom_weights:
+    lstm: 0.25
+    gru: 0.25
+    transformer: 0.15
+    xgboost: 0.15
+    lightgbm: 0.10
+    mlp: 0.10
+  stacking_meta_model: 'ridge'  # For stacking ensemble
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    - RMSE
+    - MAE
+    - MAPE
+    - R2
+    - Sharpe_Ratio
+    - Directional_Accuracy
+    - Max_Drawdown
+  
+  plot_predictions: true
+  save_predictions: true
+  confidence_intervals: true
+  confidence_level: 0.95
+  
+  # Financial Metrics
+  financial_metrics:
+    risk_free_rate: 0.02  # 2% annual risk-free rate
+    trading_cost: 0.001  # 0.1% per trade
+    initial_capital: 100000
+
+# Logging Configuration
+logging:
+  level: INFO  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
+  save_to_file: true
+  log_dir: logs
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# AWS S3 Configuration (for remote storage)
+s3:
+  bucket_name: foresightx-mlops
+  paths:
+    raw_data: 'raw-data/'
+    processed_data: 'processed-data/'
+    models: 'models/'
+    predictions: 'predictions/'
+    reports: 'reports/'
+  
+  # Model versioning
+  versioning:
+    enabled: true
+    strategy: 'timestamp'  # Options: timestamp, semantic, hash
+
+# Model Registry Configuration
+model_registry:
+  track_experiments: true
+  save_artifacts: true
+  compare_metrics: true
+  auto_archive: true
+  retention_days: 90

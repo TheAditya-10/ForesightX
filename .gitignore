@@ -211,3 +211,6 @@ __marimo__/
 data/
 models/
 logs/
+/data
+/models
+/logs
