@@ -208,9 +208,6 @@ __marimo__/
 
 
 #DVC Tracking
-data/
-models/
-logs/
 /data
 /models
 /logs

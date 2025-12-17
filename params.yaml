@@ -1,27 +1,42 @@
-# ForesightX Parameters
-# ======================
-# Centralized configuration for all ML pipeline stages
+# ForesightX Parameters Configuration
+# =====================================
+# Centralized configuration for ML pipeline stages
+#
+# This file contains all hyperparameters and settings for:
+# 1. Data Ingestion (make_dataset.py) - Fetch stock data from Yahoo Finance
+# 2. Data Preprocessing (preprocess.py) - Clean and split data into train/test
+# 3. Feature Engineering (build_features.py) - Create technical indicators
+# 4. Model Training - Train multiple ML/DL models
+# 5. Model Evaluation - Evaluate and compare models
+# 6. Logging & Storage - Configure logging and cloud storage
+#
+# Usage:
+# - Edit parameters as needed for experimentation
+# - All modules automatically load from this file
+# - Keep this file in project root directory
+
+# =============================================================================
+# DATA PIPELINE CONFIGURATION
+# =============================================================================
 
 # Data Ingestion Configuration
 data_ingestion:
   stock_symbol: AAPL
   start_date: '2015-01-01'
   end_date: '2023-12-31'
-  source: yfinance  # Options: yfinance, alpha_vantage, csv
-  api_key: null  # Required for alpha_vantage
+  source: yfinance  # Only yfinance is supported
 
 # Data Preprocessing Configuration
 preprocessing:
-  handle_missing: ffill  # Options: ffill, bfill, interpolate, drop
-  remove_outliers: true
-  outlier_method: iqr  # Options: iqr, zscore
-  outlier_threshold: 3.0
-  validate_data: true
-  min_trading_days: 252  # Minimum trading days required
+  handle_missing: ffill  # Options: ffill, bfill (uses forward fill then backward fill)
+  remove_outliers: false  # Whether to remove outliers (false = detect only, true = remove)
+  outlier_method: iqr  # Method to detect outliers: iqr or zscore
+  outlier_threshold: 3.0  # IQR multiplier for outlier detection (3.0 = extreme outliers only)
+  min_trading_days: 252  # Minimum trading days recommended for training
 
 # Feature Engineering Configuration
 feature_engineering:
-  # Technical Indicators
+  # Technical Indicators to create
   technical_indicators:
     - SMA_20
     - SMA_50
@@ -38,7 +53,7 @@ feature_engineering:
     - Stochastic_K
     - Stochastic_D
   
-  # Lag Features
+  # Lag Features (historical values)
   lag_features:
     enabled: true
     lag_periods: [1, 2, 3, 5, 10]
@@ -55,12 +70,16 @@ feature_engineering:
     rolling_std_window: 20
     historical_volatility_window: 30
 
+# =============================================================================
+# MODEL TRAINING CONFIGURATION
+# =============================================================================
+
 # Training Configuration
 training:
-  test_size: 0.2
-  validation_size: 0.1
+  test_size: 0.2  # Proportion of data for testing (chronological split)
+  validation_size: 0.1  # For model validation during training
   random_state: 42
-  sequence_length: 60  # For deep learning models
+  sequence_length: 60  # For deep learning models (number of historical days)
   batch_size: 32
   epochs: 100
   early_stopping_patience: 10
@@ -202,6 +221,10 @@ ensemble:
     mlp: 0.10
   stacking_meta_model: 'ridge'  # For stacking ensemble
 
+# =============================================================================
+# EVALUATION & MONITORING CONFIGURATION
+# =============================================================================
+
 # Evaluation Configuration
 evaluation:
   metrics:
@@ -224,18 +247,23 @@ evaluation:
     trading_cost: 0.001  # 0.1% per trade
     initial_capital: 100000
 
+# =============================================================================
+# INFRASTRUCTURE CONFIGURATION
+# =============================================================================
+
 # Logging Configuration
 logging:
   level: INFO  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
   format: '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
   save_to_file: true
   log_dir: logs
-  max_bytes: 10485760  # 10MB
-  backup_count: 5
+  max_bytes: 10485760  # 10MB per log file
+  backup_count: 5  # Number of backup log files to keep
 
-# AWS S3 Configuration (for remote storage)
+# AWS S3 Configuration (Optional - for remote storage)
+# Set credentials in .env file: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET_NAME
 s3:
-  bucket_name: foresightx-mlops
+  bucket_name: foresightx-mlops  # Your S3 bucket name
   paths:
     raw_data: 'raw-data/'
     processed_data: 'processed-data/'
