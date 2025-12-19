@@ -209,4 +209,4 @@ stages:
         mlflow.dagshub_repo: ForesightX
         mlflow.dagshub_username: TheAditya-10
         mlflow.enabled: true
-        model_registry.default_stage: Production
+        model_registry.default_stage: Staging

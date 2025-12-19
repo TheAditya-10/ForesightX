@@ -325,7 +325,7 @@ model_registry:
   # Staging = For models under testing/validation
   # Production = For models actively serving predictions
   # Archived = For deprecated/old models
-  default_stage: "Production"  # Recommended: Start with Staging, promote to Production after validation
+  default_stage: "Staging"  # Recommended: Start with Staging, promote to Production after validation
 
 # MLflow & DagsHub Configuration
 # DagsHub provides hosted MLflow tracking server
