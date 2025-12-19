@@ -86,14 +86,18 @@ class DataPreprocessor:
             # Setup directories
             self._setup_directories()
             
-            # Initialize S3 service (optional)
+            # Initialize S3 service (optional - for production use)
+            # Currently using local storage only, S3 will be configured later
             self.s3_service = None
+            self.s3_enabled = False
             try:
                 self.s3_service = S3Service()
                 if self.s3_service.test_connection():
-                    self.logger.info("S3 service initialized successfully")
+                    self.logger.info("S3 service initialized and connected successfully")
+                    self.s3_enabled = True
             except Exception as e:
-                self.logger.warning(f"S3 service not available: {e}")
+                self.logger.info(f"S3 not configured - using local storage only (this is fine for development)")
+                self.logger.debug(f"S3 initialization skipped: {e}")
             
             self.logger.info("Preprocessing pipeline initialized successfully")
             
@@ -524,8 +528,8 @@ class DataPreprocessor:
                 'stats_path': str(stats_path)
             }
             
-            # Upload to S3 if enabled
-            if save_to_s3 and self.s3_service:
+            # Upload to S3 if enabled and configured
+            if save_to_s3 and self.s3_enabled and self.s3_service:
                 try:
                     s3_train_path = self.config['s3']['paths']['processed_data'] + train_filename
                     s3_test_path = self.config['s3']['paths']['processed_data'] + test_filename
@@ -539,6 +543,8 @@ class DataPreprocessor:
                     
                 except Exception as e:
                     self.logger.warning(f"  S3 upload failed: {e}")
+            elif save_to_s3 and not self.s3_enabled:
+                self.logger.info("  S3 upload requested but S3 not configured - data saved locally only")
             
             return result
             
