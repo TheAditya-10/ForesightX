@@ -270,13 +270,30 @@ logging:
 # DVC tracks data versions locally without requiring cloud storage
 dvc:
   local_storage: true  # Using local storage for now
-  remote_storage: false  # Will enable S3 remote in production
+  remote_storage: true  # DagsHub remote enabled
   cache_dir: .dvc/cache  # Local DVC cache directory
+
+# DagsHub Cloud Storage (Free 10GB)
+# Integrated DVC remote + MLflow tracking + Web UI
+# Get token from: https://dagshub.com/user/settings/tokens
+dagshub_storage:
+  enabled: true  # Set to false to disable DagsHub uploads
+  username: 'TheAditya-10'  # From DAGSHUB_USERNAME env
+  repo: 'ForesightX'  # From DAGSHUB_REPO env
+  # Token from DAGSHUB_TOKEN environment variable
+  save_to_dagshub: true  # Upload data/models to DagsHub
+  paths:
+    raw_data: 'data/raw/'
+    processed_data: 'data/processed/'
+    features: 'data/features/'
+    models: 'models/'
+    results: 'results/'
+    metadata: 'metadata/'
 
 # AWS S3 Configuration (Optional - for production deployment)
 # Currently NOT required - all data stored locally in /data directory
 # S3 will be configured later when moving to production
-# To enable: Set credentials in .env file and set remote_storage: true above
+# To enable: Set credentials in .env file and set enabled: true below
 s3:
   enabled: false  # Set to true when S3 is configured
   bucket_name: foresightx-mlops  # Your S3 bucket name (configure later)
