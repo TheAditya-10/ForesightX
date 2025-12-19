@@ -145,17 +145,16 @@ models:
   
   # MLP (Multi-Layer Perceptron)
   mlp:
-    hidden_layer_sizes: [100, 50, 25]
-    activation: 'relu'
-    solver: 'adam'
-    alpha: 0.0001
-    batch_size: 32
-    learning_rate: 'adaptive'
-    learning_rate_init: 0.001
-    max_iter: 500
-    early_stopping: true
-    validation_fraction: 0.1
-    n_iter_no_change: 20
+    hidden_layer_sizes: [128, 64, 32]  # Three hidden layers
+    activation: 'relu'  # Options: relu, tanh, logistic
+    solver: 'adam'  # Options: adam, sgd, lbfgs
+    alpha: 0.0001  # L2 regularization parameter
+    learning_rate: 'adaptive'  # Options: constant, invscaling, adaptive
+    learning_rate_init: 0.001  # Initial learning rate
+    max_iter: 200  # Maximum number of iterations
+    early_stopping: true  # Enable early stopping
+    validation_fraction: 0.1  # Fraction of training data for validation
+    n_iter_no_change: 15  # Iterations with no improvement before stopping
     random_state: 42
   
   # LSTM (PyTorch)
@@ -302,3 +301,29 @@ model_registry:
   compare_metrics: true
   auto_archive: true
   retention_days: 90
+  
+  # Default stage for newly registered models
+  # Options: None, "Staging", "Production", "Archived"
+  # None = No stage assignment (model needs manual promotion)
+  # Staging = For models under testing/validation
+  # Production = For models actively serving predictions
+  # Archived = For deprecated/old models
+  default_stage: "Staging"  # Recommended: Start with Staging, promote to Production after validation
+
+# MLflow & DagsHub Configuration
+# DagsHub provides hosted MLflow tracking server
+# Set DAGSHUB_TOKEN environment variable for authentication
+mlflow:
+  enabled: true  # Set to false to disable MLflow tracking
+  dagshub_username: 'TheAditya-10'  # Your DagsHub username
+  dagshub_repo: 'ForesightX'  # Your DagsHub repository name
+  experiment_name: 'MLP_Stock_Prediction'  # MLflow experiment name
+  
+  # What to log
+  log_params: true  # Log hyperparameters
+  log_metrics: true  # Log evaluation metrics
+  log_models: true  # Log model artifacts
+  log_artifacts: true  # Log additional files (plots, configs)
+  
+  # Auto-logging
+  autolog: false  # Disable auto-logging (we do manual logging for better control)
