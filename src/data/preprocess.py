@@ -488,10 +488,9 @@ class DataPreprocessor:
             self.logger.info("Saving processed data...")
             
             # Generate file paths
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             train_filename = f"train_data_{symbol}.csv"
             test_filename = f"test_data_{symbol}.csv"
-            stats_filename = f"preprocessing_stats_{symbol}_{timestamp}.json"
+            stats_filename = f"preprocessing_stats_{symbol}.json"
             
             train_path = Path("data/processed") / train_filename
             test_path = Path("data/processed") / test_filename

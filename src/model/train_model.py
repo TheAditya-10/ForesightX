@@ -129,16 +129,12 @@ class MLPModelTrainer:
         try:
             self.logger.info(f"Loading feature-engineered data for {symbol}...")
             
-            # Find most recent features file
+            # Load features file
             features_dir = os.path.join('data', 'features')
-            features_files = [f for f in os.listdir(features_dir) if f.startswith(f'features_{symbol}_') and f.endswith('.csv')]
+            features_file = os.path.join(features_dir, f'features_{symbol}.csv')
             
-            if not features_files:
-                raise ModelTrainingError(f"No features file found for {symbol}")
-            
-            # Get most recent file
-            features_files.sort(reverse=True)
-            features_file = os.path.join(features_dir, features_files[0])
+            if not os.path.exists(features_file):
+                raise ModelTrainingError(f"No features file found for {symbol}: {features_file}")
             
             df = pd.read_csv(features_file)
             
@@ -380,20 +376,18 @@ class MLPModelTrainer:
             models_dir = 'models'
             os.makedirs(models_dir, exist_ok=True)
             
-            # Timestamp
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            
             # Save model
-            model_file = os.path.join(models_dir, f'mlp_model_{symbol}_{timestamp}.pkl')
+            model_file = os.path.join(models_dir, f'mlp_model_{symbol}.pkl')
             with open(model_file, 'wb') as f:
                 pickle.dump(model, f)
             
             # Save scaler
-            scaler_file = os.path.join(models_dir, f'mlp_scaler_{symbol}_{timestamp}.pkl')
+            scaler_file = os.path.join(models_dir, f'mlp_scaler_{symbol}.pkl')
             with open(scaler_file, 'wb') as f:
                 pickle.dump(scaler, f)
             
             # Save metadata
+            timestamp = datetime.now().isoformat()
             metadata = {
                 'symbol': symbol,
                 'timestamp': timestamp,
@@ -414,7 +408,7 @@ class MLPModelTrainer:
             
             metadata_dir = 'metadata'
             os.makedirs(metadata_dir, exist_ok=True)
-            metadata_file = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}_{timestamp}.json')
+            metadata_file = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}.json')
             
             with open(metadata_file, 'w') as f:
                 json.dump(metadata, f, indent=2)
@@ -431,9 +425,9 @@ class MLPModelTrainer:
                     s3_models_path = self.s3_config.get('paths', {}).get('models', 'models')
                     
                     # Upload files
-                    s3_model_key = f"{s3_models_path}/mlp_model_{symbol}_{timestamp}.pkl"
-                    s3_scaler_key = f"{s3_models_path}/mlp_scaler_{symbol}_{timestamp}.pkl"
-                    s3_metadata_key = f"{s3_models_path}/mlp_model_stats_{symbol}_{timestamp}.json"
+                    s3_model_key = f"{s3_models_path}/mlp_model_{symbol}.pkl"
+                    s3_scaler_key = f"{s3_models_path}/mlp_scaler_{symbol}.pkl"
+                    s3_metadata_key = f"{s3_models_path}/mlp_model_stats_{symbol}.json"
                     
                     if self.s3_service.upload_file(model_file, bucket, s3_model_key):
                         self.logger.info(f"Model uploaded to S3: s3://{bucket}/{s3_model_key}")

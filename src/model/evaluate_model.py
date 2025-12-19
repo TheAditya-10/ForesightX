@@ -224,17 +224,12 @@ class MLPModelEvaluator:
         try:
             self.logger.info(f"Loading test data for {symbol}...")
             
-            # Find most recent features file
+            # Load features file
             features_dir = os.path.join('data', 'features')
-            features_files = [f for f in os.listdir(features_dir) 
-                            if f.startswith(f'features_{symbol}_') and f.endswith('.csv')]
+            features_file = os.path.join(features_dir, f'features_{symbol}.csv')
             
-            if not features_files:
-                raise ModelEvaluationError(f"No features file found for {symbol}")
-            
-            # Get most recent file
-            features_files.sort(reverse=True)
-            features_file = os.path.join(features_dir, features_files[0])
+            if not os.path.exists(features_file):
+                raise ModelEvaluationError(f"No features file found for {symbol}: {features_file}")
             
             df = pd.read_csv(features_file)
             
@@ -389,13 +384,10 @@ class MLPModelEvaluator:
             results_dir = 'results'
             os.makedirs(results_dir, exist_ok=True)
             
-            # Timestamp
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            
             # Combine with model metadata
             full_results = {
                 'symbol': symbol,
-                'evaluation_timestamp': timestamp,
+                'evaluation_timestamp': datetime.now().isoformat(),
                 'model_info': {
                     'model_type': self.metadata.get('model_type', 'Unknown'),
                     'architecture': self.metadata.get('architecture', []),
@@ -409,8 +401,8 @@ class MLPModelEvaluator:
             if self.metadata and 'metrics' in self.metadata:
                 full_results['training_metrics'] = self.metadata['metrics']
             
-            # Save metrics JSON
-            metrics_file = os.path.join(results_dir, f'evaluation_metrics_{symbol}_{timestamp}.json')
+            # Save metrics
+            metrics_file = os.path.join(results_dir, f'evaluation_metrics_{symbol}.json')
             with open(metrics_file, 'w') as f:
                 json.dump(full_results, f, indent=2)
             
@@ -419,7 +411,7 @@ class MLPModelEvaluator:
             # Save predictions if provided
             predictions_file = None
             if predictions is not None:
-                predictions_file = os.path.join(results_dir, f'predictions_{symbol}_{timestamp}.csv')
+                predictions_file = os.path.join(results_dir, f'predictions_{symbol}.csv')
                 pred_df = pd.DataFrame({
                     'Date': predictions.get('dates', range(len(predictions['y_test']))),
                     'Actual': predictions['y_test'],
@@ -439,13 +431,13 @@ class MLPModelEvaluator:
                     s3_results_path = self.s3_config.get('paths', {}).get('results', 'results')
                     
                     # Upload metrics
-                    s3_metrics_key = f"{s3_results_path}/evaluation_metrics_{symbol}_{timestamp}.json"
+                    s3_metrics_key = f"{s3_results_path}/evaluation_metrics_{symbol}.json"
                     if self.s3_service.upload_file(metrics_file, bucket, s3_metrics_key):
                         self.logger.info(f"Metrics uploaded to S3: s3://{bucket}/{s3_metrics_key}")
                     
                     # Upload predictions if available
                     if predictions_file:
-                        s3_pred_key = f"{s3_results_path}/predictions_{symbol}_{timestamp}.csv"
+                        s3_pred_key = f"{s3_results_path}/predictions_{symbol}.csv"
                         if self.s3_service.upload_file(predictions_file, bucket, s3_pred_key):
                             self.logger.info(f"Predictions uploaded to S3: s3://{bucket}/{s3_pred_key}")
                     
@@ -583,22 +575,13 @@ class MLPModelEvaluator:
                 models_dir = 'models'
                 metadata_dir = 'metadata'
                 
-                # Find latest model files
-                model_files = [f for f in os.listdir(models_dir) 
-                             if f.startswith(f'mlp_model_{symbol}_') and f.endswith('.pkl')]
+                # Use fixed filenames
+                model_path = os.path.join(models_dir, f'mlp_model_{symbol}.pkl')
+                scaler_path = os.path.join(models_dir, f'mlp_scaler_{symbol}.pkl')
+                metadata_path = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}.json')
                 
-                if not model_files:
-                    raise ModelEvaluationError(f"No model files found for {symbol}")
-                
-                model_files.sort(reverse=True)
-                latest_model = model_files[0]
-                
-                model_path = os.path.join(models_dir, latest_model)
-                scaler_path = model_path.replace('mlp_model_', 'mlp_scaler_')
-                
-                # Find corresponding metadata
-                timestamp = latest_model.replace(f'mlp_model_{symbol}_', '').replace('.pkl', '')
-                metadata_path = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}_{timestamp}.json')
+                if not os.path.exists(model_path):
+                    raise ModelEvaluationError(f"No model file found: {model_path}")
                 
                 self.logger.info(f"Using model: {model_path}")
                 self.logger.info(f"Using scaler: {scaler_path}")

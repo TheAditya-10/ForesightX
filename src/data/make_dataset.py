@@ -222,8 +222,10 @@ class StockDataIngestion:
             if not symbol or not isinstance(symbol, str):
                 raise DataIngestionError("Invalid stock symbol")
             
-            if not symbol.isalnum():
-                raise DataIngestionError("Symbol must be alphanumeric")
+            # Allow alphanumeric, dots, hyphens, underscores (for exchange suffixes like .BO, .NS, etc.)
+            import re
+            if not re.match(r'^[A-Za-z0-9._-]+$', symbol):
+                raise DataIngestionError("Symbol must contain only alphanumeric characters, dots, hyphens, or underscores")
             
             # Validate dates
             start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -415,9 +417,8 @@ class StockDataIngestion:
             self.logger.info("Saving data to disk...")
             
             # Generate file paths
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             data_filename = f"stock_data_raw_{symbol}.csv"
-            metadata_filename = f"stock_metadata_{symbol}_{timestamp}.json"
+            metadata_filename = f"stock_metadata_{symbol}.json"
             
             data_path = Path("data/raw") / data_filename
             metadata_path = Path("metadata") / metadata_filename

@@ -1,0 +1,212 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: 76b2dc77df8ea58f34d891ff6ccd65ac
+      size: 21042
+    - path: src/services/logger.py
+      hash: md5
+      md5: 3a571d672a3ea9d7531edf517f93e80d
+      size: 6927
+    params:
+      params.yaml:
+        data_ingestion.end_date: '2025-12-19'
+        data_ingestion.source: yfinance
+        data_ingestion.start_date: '2015-01-01'
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+    outs:
+    - path: data/raw/stock_data_raw_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 63beaa155f01069c24b5618e5cc01bba
+      size: 305045
+  data_preprocessing:
+    cmd: python src/data/preprocess.py
+    deps:
+    - path: data/raw/stock_data_raw_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 63beaa155f01069c24b5618e5cc01bba
+      size: 305045
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: 7c5b8252a97aaaa5f622492bb43b439a
+      size: 25662
+    params:
+      params.yaml:
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+        preprocessing.handle_missing: ffill
+        preprocessing.outlier_method: iqr
+        preprocessing.outlier_threshold: 3.0
+        preprocessing.remove_outliers: false
+    outs:
+    - path: data/processed/test_data_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 3a73501180aa8ce4c3e0a689e566a366
+      size: 73897
+    - path: data/processed/train_data_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 235408a54088acd8a80e268512fe8fa8
+      size: 230002
+  feature_engineering:
+    cmd: python src/features/build_features.py
+    deps:
+    - path: data/processed/test_data_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 3a73501180aa8ce4c3e0a689e566a366
+      size: 73897
+    - path: data/processed/train_data_TATAMOTORS.BO.csv
+      hash: md5
+      md5: 235408a54088acd8a80e268512fe8fa8
+      size: 230002
+    - path: src/features/build_features.py
+      hash: md5
+      md5: d921847cdda254c20ccfd772ed4476ae
+      size: 34728
+    params:
+      params.yaml:
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+        feature_engineering.atr_windows:
+        - 14
+        - 21
+        feature_engineering.bollinger_std: 2
+        feature_engineering.bollinger_window: 20
+        feature_engineering.ema_windows:
+        - 12
+        - 26
+        - 50
+        feature_engineering.lag_periods:
+        - 1
+        - 2
+        - 3
+        - 5
+        - 10
+        feature_engineering.macd_fast: 12
+        feature_engineering.macd_signal: 9
+        feature_engineering.macd_slow: 26
+        feature_engineering.roc_periods:
+        - 5
+        - 10
+        - 20
+        feature_engineering.rsi_windows:
+        - 14
+        - 21
+        feature_engineering.sma_windows:
+        - 5
+        - 10
+        - 20
+        - 50
+        - 200
+        feature_engineering.target_return_window: 1
+        feature_engineering.volatility_windows:
+        - 5
+        - 10
+        - 20
+        - 30
+        feature_engineering.volume_ma_windows:
+        - 5
+        - 20
+        - 50
+        feature_engineering.vwap_window: 20
+    outs:
+    - path: data/features
+      hash: md5
+      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
+      size: 3171271
+      nfiles: 1
+  train_model:
+    cmd: python src/model/train_model.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
+      size: 3171271
+      nfiles: 1
+    - path: src/model/train_model.py
+      hash: md5
+      md5: 82308bfae144761a87cbae0d50a0a737
+      size: 21070
+    params:
+      params.yaml:
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+        models.mlp.activation: relu
+        models.mlp.early_stopping: true
+        models.mlp.hidden_layer_sizes:
+        - 128
+        - 96
+        - 32
+        models.mlp.learning_rate_init: 0.002
+        models.mlp.max_iter: 200
+        models.mlp.solver: sgd
+        training.early_stopping_patience: 10
+        training.random_state: 42
+        training.test_size: 0.25
+        training.validation_size: 0.15
+    outs:
+    - path: models
+      hash: md5
+      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      size: 505916
+      nfiles: 2
+  evaluate_model:
+    cmd: python src/model/evaluate_model.py
+    deps:
+    - path: data/features
+      hash: md5
+      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
+      size: 3171271
+      nfiles: 1
+    - path: models
+      hash: md5
+      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      size: 505916
+      nfiles: 2
+    - path: src/model/evaluate_model.py
+      hash: md5
+      md5: 29a28c45e76c90be5a97ca0636a89a01
+      size: 28377
+    params:
+      params.yaml:
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+        evaluation.metrics:
+        - RMSE
+        - MAE
+        - MAPE
+        - R2
+        - Sharpe_Ratio
+        - Directional_Accuracy
+        - Max_Drawdown
+        mlflow.enabled: true
+        mlflow.experiment_name: MLP_Stock_Prediction
+        training.test_size: 0.25
+    outs:
+    - path: results
+      hash: md5
+      md5: 5c36275d5315b7eb509895d742db2b80.dir
+      size: 49403
+      nfiles: 2
+  register_model:
+    cmd: python src/model/model_registry.py
+    deps:
+    - path: metadata
+      hash: md5
+      md5: c08217d752225ecdcc34efea5888b68b.dir
+      size: 28701
+      nfiles: 15
+    - path: models
+      hash: md5
+      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      size: 505916
+      nfiles: 2
+    - path: src/model/model_registry.py
+      hash: md5
+      md5: 2180f3433b1fedd615614ede0f1215fa
+      size: 24826
+    params:
+      params.yaml:
+        data_ingestion.stock_symbol: TATAMOTORS.BO
+        mlflow.dagshub_repo: ForesightX
+        mlflow.dagshub_username: TheAditya-10
+        mlflow.enabled: true
+        model_registry.default_stage: Production

@@ -5,7 +5,7 @@
 
 stages:
   # Stage 1: Data Ingestion
-  # Fetch historical stock data from API
+  # Fetch historical stock data from Yahoo Finance
   data_ingestion:
     cmd: python src/data/make_dataset.py
     deps:
@@ -19,8 +19,8 @@ stages:
     outs:
       - data/raw/stock_data_raw_${data_ingestion.stock_symbol}.csv
 
-  # Stage 2: Data Validation & Preprocessing
-  # Clean and validate raw data
+  # Stage 2: Data Preprocessing
+  # Clean, validate and split data
   data_preprocessing:
     cmd: python src/data/preprocess.py
     deps:
@@ -30,154 +30,96 @@ stages:
       - data_ingestion.stock_symbol
       - preprocessing.handle_missing
       - preprocessing.remove_outliers
-      - preprocessing.validate_data
+      - preprocessing.outlier_method
+      - preprocessing.outlier_threshold
     outs:
-      - data/interim/stock_data_processed_${data_ingestion.stock_symbol}.csv
+      - data/processed/train_data_${data_ingestion.stock_symbol}.csv
+      - data/processed/test_data_${data_ingestion.stock_symbol}.csv
 
   # Stage 3: Feature Engineering
-  # Create technical indicators and features
+  # Create 113 technical indicators and features
   feature_engineering:
     cmd: python src/features/build_features.py
     deps:
       - src/features/build_features.py
-      - data/interim/stock_data_processed_${data_ingestion.stock_symbol}.csv
+      - data/processed/train_data_${data_ingestion.stock_symbol}.csv
+      - data/processed/test_data_${data_ingestion.stock_symbol}.csv
     params:
       - data_ingestion.stock_symbol
-      - feature_engineering.technical_indicators
-      - feature_engineering.lag_features
-      - feature_engineering.moving_averages
-      - feature_engineering.volatility_features
+      - feature_engineering.lag_periods
+      - feature_engineering.sma_windows
+      - feature_engineering.ema_windows
+      - feature_engineering.rsi_windows
+      - feature_engineering.macd_fast
+      - feature_engineering.macd_slow
+      - feature_engineering.macd_signal
+      - feature_engineering.bollinger_window
+      - feature_engineering.bollinger_std
+      - feature_engineering.atr_windows
+      - feature_engineering.volatility_windows
+      - feature_engineering.volume_ma_windows
+      - feature_engineering.vwap_window
+      - feature_engineering.roc_periods
+      - feature_engineering.target_return_window
     outs:
-      - data/processed/stock_features_${data_ingestion.stock_symbol}.csv
+      - data/features
 
-  # Stage 4: Model Training - Classical Models
-  # Train ARIMA, Prophet, etc.
-  train_classical_models:
-    cmd: python src/model/train_classical.py
+  # Stage 4: Model Training
+  # Train MLP model with validation
+  train_model:
+    cmd: python src/model/train_model.py
     deps:
-      - src/model/train_classical.py
-      - data/processed/stock_features_${data_ingestion.stock_symbol}.csv
-    params:
-      - data_ingestion.stock_symbol
-      - training.test_size
-      - training.validation_size
-      - models.arima
-      - models.prophet
-    outs:
-      - models/classical/arima_model.pkl
-      - models/classical/prophet_model.pkl
-    metrics:
-      - metrics/classical_metrics.json:
-          cache: false
-
-  # Stage 5: Model Training - ML Models
-  # Train XGBoost, LightGBM, MLP
-  train_ml_models:
-    cmd: python src/model/train_ml.py
-    deps:
-      - src/model/train_ml.py
-      - data/processed/stock_features_${data_ingestion.stock_symbol}.csv
+      - src/model/train_model.py
+      - data/features
     params:
       - data_ingestion.stock_symbol
       - training.test_size
       - training.validation_size
       - training.random_state
-      - models.xgboost
-      - models.lightgbm
-      - models.mlp
+      - training.early_stopping_patience
+      - models.mlp.hidden_layer_sizes
+      - models.mlp.activation
+      - models.mlp.solver
+      - models.mlp.learning_rate_init
+      - models.mlp.max_iter
+      - models.mlp.early_stopping
     outs:
-      - models/ml/xgboost_model.pkl
-      - models/ml/lightgbm_model.pkl
-      - models/ml/mlp_model.pkl
-    metrics:
-      - metrics/ml_metrics.json:
-          cache: false
+      - models
 
-  # Stage 6: Model Training - Deep Learning
-  # Train LSTM, GRU, Transformer (PyTorch)
-  train_dl_models:
-    cmd: python src/model/train_dl.py
+  # Stage 5: Model Evaluation
+  # Evaluate model on test set with MLflow tracking
+  evaluate_model:
+    cmd: python src/model/evaluate_model.py
     deps:
-      - src/model/train_dl.py
-      - data/processed/stock_features_${data_ingestion.stock_symbol}.csv
+      - src/model/evaluate_model.py
+      - models
+      - data/features
     params:
       - data_ingestion.stock_symbol
       - training.test_size
-      - training.validation_size
-      - training.sequence_length
-      - training.batch_size
-      - training.epochs
-      - models.lstm
-      - models.gru
-      - models.transformer
-    outs:
-      - models/dl/lstm_model.pth
-      - models/dl/gru_model.pth
-      - models/dl/transformer_model.pth
-    metrics:
-      - metrics/dl_metrics.json:
-          cache: false
-
-  # Stage 7: Model Evaluation
-  # Evaluate all models on test set
-  evaluate_models:
-    cmd: python src/model/evaluate.py
-    deps:
-      - src/model/evaluate.py
-      - data/processed/stock_features_${data_ingestion.stock_symbol}.csv
-      - models/classical
-      - models/ml
-      - models/dl
-    params:
-      - data_ingestion.stock_symbol
       - evaluation.metrics
-      - evaluation.plot_predictions
+      - mlflow.enabled
+      - mlflow.experiment_name
     outs:
-      - reports/evaluation_report.json
-      - reports/figures/prediction_plots.png
-      - reports/figures/performance_comparison.png
-    metrics:
-      - metrics/test_metrics.json:
-          cache: false
+      - results
 
-  # Stage 8: Model Selection & Ensemble
-  # Select best models and create ensemble
-  create_ensemble:
-    cmd: python src/model/ensemble.py
+  # Stage 6: Model Registry
+  # Register model in MLflow Model Registry
+  register_model:
+    cmd: python src/model/model_registry.py
     deps:
-      - src/model/ensemble.py
-      - models/classical
-      - models/ml
-      - models/dl
-      - metrics/test_metrics.json
+      - src/model/model_registry.py
+      - models
+      - metadata
     params:
       - data_ingestion.stock_symbol
-      - ensemble.method
-      - ensemble.top_n_models
-      - ensemble.weights
-    outs:
-      - models/ensemble/ensemble_model.pkl
-    metrics:
-      - metrics/ensemble_metrics.json:
-          cache: false
-
-  # Stage 9: Generate Final Report
-  # Create comprehensive model report
-  generate_report:
-    cmd: python src/visualization/visualize.py
-    deps:
-      - src/visualization/visualize.py
-      - metrics/classical_metrics.json
-      - metrics/ml_metrics.json
-      - metrics/dl_metrics.json
-      - metrics/ensemble_metrics.json
-    outs:
-      - reports/final_report.html
-      - reports/figures/model_comparison.png
-      - reports/figures/feature_importance.png
+      - mlflow.enabled
+      - mlflow.dagshub_username
+      - mlflow.dagshub_repo
+      - model_registry.default_stage
 
 # Remote storage configuration (optional)
-# Uncomment and configure for cloud storage
+# Uncomment and configure for S3 or other cloud storage
 # remote:
 #   myremote:
 #     url: s3://foresightx-models

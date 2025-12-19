@@ -693,8 +693,7 @@ class FeatureEngineer:
             os.makedirs(features_dir, exist_ok=True)
             
             # Save locally
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            features_file = os.path.join(features_dir, f'features_{symbol}_{timestamp}.csv')
+            features_file = os.path.join(features_dir, f'features_{symbol}.csv')
             df.to_csv(features_file, index=False)
             
             self.logger.info(f"Features saved locally: {features_file}")
@@ -703,7 +702,7 @@ class FeatureEngineer:
             # Save metadata
             metadata = {
                 'symbol': symbol,
-                'timestamp': timestamp,
+                'timestamp': datetime.now().isoformat(),
                 'shape': df.shape,
                 'features': list(df.columns),
                 'date_range': {
@@ -716,7 +715,7 @@ class FeatureEngineer:
             
             metadata_dir = 'metadata'
             os.makedirs(metadata_dir, exist_ok=True)
-            metadata_file = os.path.join(metadata_dir, f'features_stats_{symbol}_{timestamp}.json')
+            metadata_file = os.path.join(metadata_dir, f'features_stats_{symbol}.json')
             
             import json
             with open(metadata_file, 'w') as f:
@@ -729,8 +728,8 @@ class FeatureEngineer:
             if self.s3_config.get('save_to_s3', False) and self.s3_enabled and self.s3_service:
                 try:
                     bucket = self.s3_config.get('bucket_name')
-                    s3_features_key = f"{self.s3_config.get('features_path', 'features')}/features_{symbol}_{timestamp}.csv"
-                    s3_metadata_key = f"{self.s3_config.get('features_path', 'features')}/features_stats_{symbol}_{timestamp}.json"
+                    s3_features_key = f"{self.s3_config.get('features_path', 'features')}/features_{symbol}.csv"
+                    s3_metadata_key = f"{self.s3_config.get('features_path', 'features')}/features_stats_{symbol}.json"
                     
                     # Upload features
                     if self.s3_service.upload_file(features_file, bucket, s3_features_key):

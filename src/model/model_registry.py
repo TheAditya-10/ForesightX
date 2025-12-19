@@ -174,22 +174,13 @@ class ModelRegistry:
                 models_dir = 'models'
                 metadata_dir = 'metadata'
                 
-                # Find latest model files
-                model_files = [f for f in os.listdir(models_dir) 
-                             if f.startswith(f'mlp_model_{symbol}_') and f.endswith('.pkl')]
+                # Use fixed filenames
+                model_path = os.path.join(models_dir, f'mlp_model_{symbol}.pkl')
+                scaler_path = os.path.join(models_dir, f'mlp_scaler_{symbol}.pkl')
+                metadata_path = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}.json')
                 
-                if not model_files:
-                    raise ModelRegistryError(f"No model files found for {symbol}")
-                
-                model_files.sort(reverse=True)
-                latest_model = model_files[0]
-                
-                model_path = os.path.join(models_dir, latest_model)
-                scaler_path = model_path.replace('mlp_model_', 'mlp_scaler_')
-                
-                # Find corresponding metadata
-                timestamp = latest_model.replace(f'mlp_model_{symbol}_', '').replace('.pkl', '')
-                metadata_path = os.path.join(metadata_dir, f'mlp_model_stats_{symbol}_{timestamp}.json')
+                if not os.path.exists(model_path):
+                    raise ModelRegistryError(f"No model file found: {model_path}")
             
             # Verify files exist
             if not os.path.exists(model_path):
@@ -320,7 +311,7 @@ class ModelRegistry:
                 self.logger.info("Logging model to MLflow...")
                 mlflow.sklearn.log_model(
                     sk_model=model_info['model_object'],
-                    artifact_path="model",
+                    name="model",
                     registered_model_name=model_name
                 )
                 
