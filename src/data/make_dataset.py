@@ -11,7 +11,7 @@ Features:
 - Retry mechanism for API failures
 - Metadata collection and storage
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: 2025-12-17
 """
 

@@ -12,7 +12,7 @@ Features:
 - Train/test split with chronological order
 - Comprehensive logging and exception handling
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: 2025-12-17
 """
 

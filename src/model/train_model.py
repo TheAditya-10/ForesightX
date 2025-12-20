@@ -10,7 +10,7 @@ It implements production-ready training with:
 - Performance metrics and evaluation
 - Model saving (local + S3)
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: December 2025
 """
 

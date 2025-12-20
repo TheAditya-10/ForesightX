@@ -12,7 +12,7 @@ It implements production-ready feature engineering with:
 - Price pattern features
 - Target variables for model training
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: December 2025
 """
 

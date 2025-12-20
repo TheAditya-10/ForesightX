@@ -10,7 +10,7 @@ It implements production-ready model versioning with:
 - Model metadata tracking
 - Version comparison and promotion
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: December 2025
 """
 

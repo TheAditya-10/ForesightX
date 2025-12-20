@@ -10,7 +10,7 @@ Features:
 - List and manage remote files
 - Error handling and retries
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: 2025-12-20
 """
 

@@ -10,7 +10,7 @@ It implements production-ready evaluation with:
 - MLflow experiment tracking (DagsHub integration)
 - Metrics persistence (local + S3)
 
-Author: ForesightX Team
+Author: Aditya Pratap Singh Tomar
 Date: December 2025
 """
 
