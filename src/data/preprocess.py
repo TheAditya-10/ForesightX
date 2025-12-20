@@ -35,7 +35,7 @@ import yaml
 
 # Local imports
 from src.services.logger import get_logger, log_function_call
-from src.services.s3_service import S3Service
+from src.services.dagshub_service import DagsHubService
 
 
 class PreprocessingError(Exception):
@@ -59,7 +59,7 @@ class DataPreprocessor:
     Attributes:
         config (dict): Configuration parameters from params.yaml
         logger: Configured logger instance
-        s3_service: S3 service for cloud storage (optional)
+        dagshub_service: DagsHub service for cloud storage (optional)
     """
     
     def __init__(self, config_path: str = "params.yaml"):
@@ -86,18 +86,20 @@ class DataPreprocessor:
             # Setup directories
             self._setup_directories()
             
-            # Initialize S3 service (optional - for production use)
-            # Currently using local storage only, S3 will be configured later
-            self.s3_service = None
-            self.s3_enabled = False
-            try:
-                self.s3_service = S3Service()
-                if self.s3_service.test_connection():
-                    self.logger.info("S3 service initialized and connected successfully")
-                    self.s3_enabled = True
-            except Exception as e:
-                self.logger.info(f"S3 not configured - using local storage only (this is fine for development)")
-                self.logger.debug(f"S3 initialization skipped: {e}")
+            # Initialize DagsHub service (optional - for cloud backup)
+            self.dagshub_service = None
+            self.dagshub_enabled = False
+            dagshub_config = self.config.get('dagshub_storage', {})
+            
+            if dagshub_config.get('enabled', False):
+                try:
+                    self.dagshub_service = DagsHubService()
+                    if self.dagshub_service.test_connection():
+                        self.logger.info("DagsHub storage initialized and connected successfully")
+                        self.dagshub_enabled = True
+                except Exception as e:
+                    self.logger.info(f"DagsHub not configured - using local storage only")
+                    self.logger.debug(f"DagsHub initialization skipped: {e}")
             
             self.logger.info("Preprocessing pipeline initialized successfully")
             
@@ -527,23 +529,25 @@ class DataPreprocessor:
                 'stats_path': str(stats_path)
             }
             
-            # Upload to S3 if enabled and configured
-            if save_to_s3 and self.s3_enabled and self.s3_service:
+            # Upload to DagsHub if enabled and configured
+            if save_to_s3 and self.dagshub_enabled and self.dagshub_service:
                 try:
-                    s3_train_path = self.config['s3']['paths']['processed_data'] + train_filename
-                    s3_test_path = self.config['s3']['paths']['processed_data'] + test_filename
+                    dagshub_config = self.config.get('dagshub_storage', {})
+                    dagshub_train_path = dagshub_config.get('paths', {}).get('processed_data', 'data/processed/') + train_filename
+                    dagshub_test_path = dagshub_config.get('paths', {}).get('processed_data', 'data/processed/') + test_filename
                     
-                    self.s3_service.upload_file(str(train_path), s3_train_path)
-                    self.s3_service.upload_file(str(test_path), s3_test_path)
+                    if self.dagshub_service.upload_file(str(train_path), dagshub_train_path):
+                        self.logger.info(f"  ✓ Train data uploaded to DagsHub: {dagshub_train_path}")
+                        result['dagshub_train_path'] = dagshub_train_path
                     
-                    self.logger.info(f"  ✓ Data uploaded to S3")
-                    result['s3_train_path'] = s3_train_path
-                    result['s3_test_path'] = s3_test_path
+                    if self.dagshub_service.upload_file(str(test_path), dagshub_test_path):
+                        self.logger.info(f"  ✓ Test data uploaded to DagsHub: {dagshub_test_path}")
+                        result['dagshub_test_path'] = dagshub_test_path
                     
                 except Exception as e:
-                    self.logger.warning(f"  S3 upload failed: {e}")
-            elif save_to_s3 and not self.s3_enabled:
-                self.logger.info("  S3 upload requested but S3 not configured - data saved locally only")
+                    self.logger.warning(f"  DagsHub upload failed: {e}")
+            elif save_to_s3 and not self.dagshub_enabled:
+                self.logger.info("  DagsHub upload requested but not configured - data saved locally only")
             
             return result
             

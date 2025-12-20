@@ -8,7 +8,7 @@ It implements production-ready evaluation with:
 - Test set preparation
 - Comprehensive metrics calculation
 - MLflow experiment tracking (DagsHub integration)
-- Metrics persistence (local + S3)
+- Metrics persistence (local + DagsHub)
 
 Author: Aditya Pratap Singh Tomar
 Date: December 2025
@@ -40,7 +40,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.insert(0, project_root)
 
 from src.services.logger import get_logger, log_function_call
-from src.services.s3_service import S3Service
+from src.services.dagshub_service import DagsHubService
 
 
 # =====================================================================
@@ -82,22 +82,22 @@ class MLPModelEvaluator:
         self.data_config = self.config.get('data_ingestion', {})
         self.mlflow_config = self.config.get('mlflow', {})
         
-        # S3 Configuration
-        self.s3_config = self.config.get('s3', {})
-        self.s3_service = None
-        self.s3_enabled = False
+        # DagsHub Configuration
+        self.dagshub_config = self.config.get('dagshub_storage', {})
+        self.dagshub_service = None
+        self.dagshub_enabled = False
         
-        # Initialize S3 if configured
-        if self.s3_config.get('enabled', False):
+        # Initialize DagsHub if configured
+        if self.dagshub_config.get('enabled', False):
             try:
-                self.s3_service = S3Service()
-                if self.s3_service.test_connection():
-                    self.s3_enabled = True
-                    self.logger.info("S3 service initialized successfully")
+                self.dagshub_service = DagsHubService()
+                if self.dagshub_service.test_connection():
+                    self.dagshub_enabled = True
+                    self.logger.info("DagsHub storage initialized successfully")
                 else:
-                    self.logger.warning("S3 connection test failed - using local storage only")
+                    self.logger.warning("DagsHub connection test failed - using local storage only")
             except Exception as e:
-                self.logger.info(f"S3 not configured: {str(e)} - using local storage only")
+                self.logger.info(f"DagsHub not configured: {str(e)} - using local storage only")
         
         # Initialize MLflow
         self._setup_mlflow()
@@ -361,7 +361,7 @@ class MLPModelEvaluator:
     @log_function_call
     def save_evaluation_results(self, symbol, metrics, predictions=None):
         """
-        Save evaluation metrics to local file and optionally S3.
+        Save evaluation metrics to local file and optionally DagsHub.
         
         Parameters:
         -----------
@@ -423,33 +423,32 @@ class MLPModelEvaluator:
                 pred_df.to_csv(predictions_file, index=False)
                 self.logger.info(f"Predictions saved: {predictions_file}")
             
-            # Upload to S3 if enabled
-            s3_uploaded = False
-            if self.s3_config.get('save_to_s3', False) and self.s3_enabled and self.s3_service:
+            # Upload to DagsHub if enabled
+            dagshub_uploaded = False
+            if self.dagshub_config.get('upload_results', False) and self.dagshub_enabled and self.dagshub_service:
                 try:
-                    bucket = self.s3_config.get('bucket_name')
-                    s3_results_path = self.s3_config.get('paths', {}).get('results', 'results')
+                    dagshub_results_path = self.dagshub_config.get('paths', {}).get('results', 'results/')
                     
                     # Upload metrics
-                    s3_metrics_key = f"{s3_results_path}/evaluation_metrics_{symbol}.json"
-                    if self.s3_service.upload_file(metrics_file, bucket, s3_metrics_key):
-                        self.logger.info(f"Metrics uploaded to S3: s3://{bucket}/{s3_metrics_key}")
+                    dagshub_metrics_path = dagshub_results_path + f'evaluation_metrics_{symbol}.json'
+                    if self.dagshub_service.upload_file(metrics_file, dagshub_metrics_path):
+                        self.logger.info(f"Metrics uploaded to DagsHub: {dagshub_metrics_path}")
                     
                     # Upload predictions if available
                     if predictions_file:
-                        s3_pred_key = f"{s3_results_path}/predictions_{symbol}.csv"
-                        if self.s3_service.upload_file(predictions_file, bucket, s3_pred_key):
-                            self.logger.info(f"Predictions uploaded to S3: s3://{bucket}/{s3_pred_key}")
+                        dagshub_pred_path = dagshub_results_path + f'predictions_{symbol}.csv'
+                        if self.dagshub_service.upload_file(predictions_file, dagshub_pred_path):
+                            self.logger.info(f"Predictions uploaded to DagsHub: {dagshub_pred_path}")
                     
-                    s3_uploaded = True
+                    dagshub_uploaded = True
                 except Exception as e:
-                    self.logger.warning(f"S3 upload failed: {str(e)} - results saved locally only")
+                    self.logger.warning(f"DagsHub upload failed: {str(e)} - results saved locally only")
             
             return {
                 'success': True,
                 'metrics_file': metrics_file,
                 'predictions_file': predictions_file,
-                's3_uploaded': s3_uploaded
+                'dagshub_uploaded': dagshub_uploaded
             }
             
         except Exception as e:
@@ -631,7 +630,7 @@ class MLPModelEvaluator:
                 'duration_seconds': duration,
                 'results_file': save_result['metrics_file'],
                 'predictions_file': save_result['predictions_file'],
-                's3_uploaded': save_result['s3_uploaded'],
+                'dagshub_uploaded': save_result['dagshub_uploaded'],
                 'mlflow_logged': self.mlflow_enabled
             }
             

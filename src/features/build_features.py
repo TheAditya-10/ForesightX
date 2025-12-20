@@ -30,7 +30,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.insert(0, project_root)
 
 from src.services.logger import get_logger, log_function_call
-from src.services.s3_service import S3Service
+from src.services.dagshub_service import DagsHubService
 
 
 # =====================================================================
@@ -78,22 +78,22 @@ class FeatureEngineer:
         self.preprocessing_config = self.config.get('preprocessing', {})
         self.paths_config = self.config.get('paths', {})
         
-        # S3 Configuration
-        self.s3_config = self.config.get('s3', {})
-        self.s3_service = None
-        self.s3_enabled = False
+        # DagsHub Configuration
+        self.dagshub_config = self.config.get('dagshub_storage', {})
+        self.dagshub_service = None
+        self.dagshub_enabled = False
         
-        # Initialize S3 if configured
-        if self.s3_config.get('enabled', False):
+        # Initialize DagsHub if configured
+        if self.dagshub_config.get('enabled', False):
             try:
-                self.s3_service = S3Service()
-                if self.s3_service.test_connection():
-                    self.s3_enabled = True
-                    self.logger.info("S3 service initialized successfully")
+                self.dagshub_service = DagsHubService()
+                if self.dagshub_service.test_connection():
+                    self.dagshub_enabled = True
+                    self.logger.info("DagsHub storage initialized successfully")
                 else:
-                    self.logger.warning("S3 connection test failed - using local storage only (this is fine for development)")
+                    self.logger.warning("DagsHub connection test failed - using local storage only")
             except Exception as e:
-                self.logger.info(f"S3 not configured: {str(e)} - using local storage only (this is fine for development)")
+                self.logger.info(f"DagsHub not configured: {str(e)} - using local storage only")
         
         self.logger.info("FeatureEngineer initialized successfully")
     
@@ -723,33 +723,32 @@ class FeatureEngineer:
             
             self.logger.info(f"Metadata saved: {metadata_file}")
             
-            # Upload to S3 if enabled
-            s3_uploaded = False
-            if self.s3_config.get('save_to_s3', False) and self.s3_enabled and self.s3_service:
+            # Upload to DagsHub if enabled
+            dagshub_uploaded = False
+            if self.dagshub_config.get('upload_data', False) and self.dagshub_enabled and self.dagshub_service:
                 try:
-                    bucket = self.s3_config.get('bucket_name')
-                    s3_features_key = f"{self.s3_config.get('features_path', 'features')}/features_{symbol}.csv"
-                    s3_metadata_key = f"{self.s3_config.get('features_path', 'features')}/features_stats_{symbol}.json"
+                    dagshub_features_path = self.dagshub_config.get('paths', {}).get('features', 'data/features/') + f'features_{symbol}.csv'
+                    dagshub_metadata_path = f'metadata/features_stats_{symbol}.json'
                     
                     # Upload features
-                    if self.s3_service.upload_file(features_file, bucket, s3_features_key):
-                        self.logger.info(f"Features uploaded to S3: s3://{bucket}/{s3_features_key}")
+                    if self.dagshub_service.upload_file(features_file, dagshub_features_path):
+                        self.logger.info(f"Features uploaded to DagsHub: {dagshub_features_path}")
                     
                     # Upload metadata
-                    if self.s3_service.upload_file(metadata_file, bucket, s3_metadata_key):
-                        self.logger.info(f"Metadata uploaded to S3: s3://{bucket}/{s3_metadata_key}")
+                    if self.dagshub_service.upload_file(metadata_file, dagshub_metadata_path):
+                        self.logger.info(f"Metadata uploaded to DagsHub: {dagshub_metadata_path}")
                     
-                    s3_uploaded = True
+                    dagshub_uploaded = True
                 except Exception as e:
-                    self.logger.warning(f"S3 upload failed: {str(e)} - data saved locally only")
-            elif self.s3_config.get('save_to_s3', False):
-                self.logger.info("S3 upload requested but S3 not configured - data saved locally only")
+                    self.logger.warning(f"DagsHub upload failed: {str(e)} - data saved locally only")
+            elif self.dagshub_config.get('upload_data', False):
+                self.logger.info("DagsHub upload requested but not configured - data saved locally only")
             
             return {
                 'success': True,
                 'local_file': features_file,
                 'metadata_file': metadata_file,
-                's3_uploaded': s3_uploaded,
+                'dagshub_uploaded': dagshub_uploaded,
                 'shape': df.shape,
                 'features_count': len(df.columns)
             }

@@ -33,7 +33,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.insert(0, project_root)
 
 from src.services.logger import get_logger, log_function_call
-from src.services.s3_service import S3Service
+from src.services.dagshub_service import DagsHubService
 
 
 # =====================================================================
@@ -75,22 +75,22 @@ class MLPModelTrainer:
         self.model_config = self.config.get('models', {}).get('mlp', {})
         self.data_config = self.config.get('data_ingestion', {})
         
-        # S3 Configuration
-        self.s3_config = self.config.get('s3', {})
-        self.s3_service = None
-        self.s3_enabled = False
+        # DagsHub Configuration
+        self.dagshub_config = self.config.get('dagshub_storage', {})
+        self.dagshub_service = None
+        self.dagshub_enabled = False
         
-        # Initialize S3 if configured
-        if self.s3_config.get('enabled', False):
+        # Initialize DagsHub if configured
+        if self.dagshub_config.get('enabled', False):
             try:
-                self.s3_service = S3Service()
-                if self.s3_service.test_connection():
-                    self.s3_enabled = True
-                    self.logger.info("S3 service initialized successfully")
+                self.dagshub_service = DagsHubService()
+                if self.dagshub_service.test_connection():
+                    self.dagshub_enabled = True
+                    self.logger.info("DagsHub storage initialized successfully")
                 else:
-                    self.logger.warning("S3 connection test failed - using local storage only")
+                    self.logger.warning("DagsHub connection test failed - using local storage only")
             except Exception as e:
-                self.logger.info(f"S3 not configured: {str(e)} - using local storage only")
+                self.logger.info(f"DagsHub not configured: {str(e)} - using local storage only")
         
         # Model and scaler
         self.model = None
@@ -417,39 +417,38 @@ class MLPModelTrainer:
             self.logger.info(f"Scaler saved: {scaler_file}")
             self.logger.info(f"Metadata saved: {metadata_file}")
             
-            # Upload to S3 if enabled
-            s3_uploaded = False
-            if self.s3_config.get('save_to_s3', False) and self.s3_enabled and self.s3_service:
+            # Upload to DagsHub if enabled
+            dagshub_uploaded = False
+            if self.dagshub_config.get('upload_models', False) and self.dagshub_enabled and self.dagshub_service:
                 try:
-                    bucket = self.s3_config.get('bucket_name')
-                    s3_models_path = self.s3_config.get('paths', {}).get('models', 'models')
+                    dagshub_models_path = self.dagshub_config.get('paths', {}).get('models', 'models/')
                     
                     # Upload files
-                    s3_model_key = f"{s3_models_path}/mlp_model_{symbol}.pkl"
-                    s3_scaler_key = f"{s3_models_path}/mlp_scaler_{symbol}.pkl"
-                    s3_metadata_key = f"{s3_models_path}/mlp_model_stats_{symbol}.json"
+                    dagshub_model_path = dagshub_models_path + f'mlp_model_{symbol}.pkl'
+                    dagshub_scaler_path = dagshub_models_path + f'mlp_scaler_{symbol}.pkl'
+                    dagshub_metadata_path = 'metadata/' + f'mlp_model_stats_{symbol}.json'
                     
-                    if self.s3_service.upload_file(model_file, bucket, s3_model_key):
-                        self.logger.info(f"Model uploaded to S3: s3://{bucket}/{s3_model_key}")
+                    if self.dagshub_service.upload_file(model_file, dagshub_model_path):
+                        self.logger.info(f"Model uploaded to DagsHub: {dagshub_model_path}")
                     
-                    if self.s3_service.upload_file(scaler_file, bucket, s3_scaler_key):
-                        self.logger.info(f"Scaler uploaded to S3: s3://{bucket}/{s3_scaler_key}")
+                    if self.dagshub_service.upload_file(scaler_file, dagshub_scaler_path):
+                        self.logger.info(f"Scaler uploaded to DagsHub: {dagshub_scaler_path}")
                     
-                    if self.s3_service.upload_file(metadata_file, bucket, s3_metadata_key):
-                        self.logger.info(f"Metadata uploaded to S3: s3://{bucket}/{s3_metadata_key}")
+                    if self.dagshub_service.upload_file(metadata_file, dagshub_metadata_path):
+                        self.logger.info(f"Metadata uploaded to DagsHub: {dagshub_metadata_path}")
                     
-                    s3_uploaded = True
+                    dagshub_uploaded = True
                 except Exception as e:
-                    self.logger.warning(f"S3 upload failed: {str(e)} - models saved locally only")
-            elif self.s3_config.get('save_to_s3', False):
-                self.logger.info("S3 upload requested but S3 not configured - models saved locally only")
+                    self.logger.warning(f"DagsHub upload failed: {str(e)} - models saved locally only")
+            elif self.dagshub_config.get('upload_models', False):
+                self.logger.info("DagsHub upload requested but not configured - models saved locally only")
             
             return {
                 'success': True,
                 'model_file': model_file,
                 'scaler_file': scaler_file,
                 'metadata_file': metadata_file,
-                's3_uploaded': s3_uploaded
+                'dagshub_uploaded': dagshub_uploaded
             }
             
         except Exception as e:

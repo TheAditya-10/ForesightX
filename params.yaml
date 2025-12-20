@@ -23,7 +23,7 @@
 data_ingestion:
   stock_symbol: NVDA  # Stock ticker symbol (e.g., AAPL, MSFT, GOOGL)
   start_date: '2015-01-01'
-  end_date: '2025-12-20'
+  # end_date: '2025-12-20' -> Replaced with dynamic current date in code
   source: yfinance  # Only yfinance is supported
 
 # Data Preprocessing Configuration

@@ -18,7 +18,7 @@ Date: 2025-12-17
 import os
 import sys
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional, Dict, Any, Tuple
 import time
 import json
@@ -35,7 +35,7 @@ import yaml
 
 # Local imports
 from src.services.logger import get_logger, log_function_call
-from src.services.s3_service import S3Service
+from src.services.dagshub_service import DagsHubService
 
 
 class DataIngestionError(Exception):
@@ -57,7 +57,7 @@ class StockDataIngestion:
     Attributes:
         config (dict): Configuration parameters from params.yaml
         logger: Configured logger instance
-        s3_service: S3 service for cloud storage (optional)
+        dagshub_service: DagsHubService instance for cloud storage
     """
     
     def __init__(self, config_path: str = "params.yaml"):
@@ -84,18 +84,20 @@ class StockDataIngestion:
             # Setup directories
             self._setup_directories()
             
-            # Initialize S3 service (optional - for production use)
-            # Currently using local storage only, S3 will be configured later
-            self.s3_service = None
-            self.s3_enabled = False
-            try:
-                self.s3_service = S3Service()
-                if self.s3_service.test_connection():
-                    self.logger.info("S3 service initialized and connected successfully")
-                    self.s3_enabled = True
-            except Exception as e:
-                self.logger.info(f"S3 not configured - using local storage only (this is fine for development)")
-                self.logger.debug(f"S3 initialization skipped: {e}")
+            # Initialize DagsHub service (optional - for cloud backup)
+            self.dagshub_service = None
+            self.dagshub_enabled = False
+            dagshub_config = self.config.get('dagshub_storage', {})
+            
+            if dagshub_config.get('enabled', False):
+                try:
+                    self.dagshub_service = DagsHubService()
+                    if self.dagshub_service.test_connection():
+                        self.logger.info("DagsHub storage initialized and connected successfully")
+                        self.dagshub_enabled = True
+                except Exception as e:
+                    self.logger.info(f"DagsHub not configured - using local storage only")
+                    self.logger.debug(f"DagsHub initialization skipped: {e}")
             
             self.logger.info("Data ingestion pipeline initialized successfully")
             
@@ -174,7 +176,7 @@ class StockDataIngestion:
         # Use config values if parameters not provided
         symbol = symbol or self.config['data_ingestion']['stock_symbol']
         start_date = start_date or self.config['data_ingestion']['start_date']
-        end_date = end_date or self.config['data_ingestion']['end_date']
+        end_date = date.today() or self.config['data_ingestion']['end_date']
         
         self.logger.info(f"Fetching data for {symbol}")
         self.logger.info(f"  Source: Yahoo Finance (yfinance)")
@@ -396,16 +398,16 @@ class StockDataIngestion:
         df: pd.DataFrame, 
         metadata: Dict[str, Any],
         symbol: str,
-        save_to_s3: bool = False
+        save_to_dagshub: bool = False
     ) -> Dict[str, str]:
         """
-        Save data to local filesystem and optionally to S3.
+        Save data to local filesystem and optionally to DagsHub storage.
         
         Args:
             df: DataFrame to save
             metadata: Metadata dictionary
             symbol: Stock symbol
-            save_to_s3: Whether to upload to S3
+            save_to_dagshub: Whether to upload to DagsHub
             
         Returns:
             Dictionary with file paths
@@ -448,23 +450,25 @@ class StockDataIngestion:
                 'metadata_path': str(metadata_path)
             }
             
-            # Upload to S3 if enabled and configured
-            if save_to_s3 and self.s3_enabled and self.s3_service:
+            # Upload to DagsHub if enabled and configured
+            if save_to_dagshub and self.dagshub_enabled and self.dagshub_service:
                 try:
-                    s3_data_path = self.config['s3']['paths']['raw_data'] + data_filename
-                    s3_metadata_path = self.config['s3']['paths']['raw_data'] + metadata_filename
+                    dagshub_config = self.config.get('dagshub_storage', {})
+                    dagshub_data_path = dagshub_config.get('paths', {}).get('raw_data', 'data/raw/') + data_filename
+                    dagshub_metadata_path = 'metadata/' + metadata_filename
                     
-                    self.s3_service.upload_file(str(data_path), s3_data_path)
-                    self.s3_service.upload_file(str(metadata_path), s3_metadata_path)
+                    if self.dagshub_service.upload_file(str(data_path), dagshub_data_path):
+                        self.logger.info(f"✓ Data uploaded to DagsHub: {dagshub_data_path}")
+                        result['dagshub_data_path'] = dagshub_data_path
                     
-                    self.logger.info(f"✓ Data uploaded to S3: {s3_data_path}")
-                    result['s3_data_path'] = s3_data_path
-                    result['s3_metadata_path'] = s3_metadata_path
+                    if self.dagshub_service.upload_file(str(metadata_path), dagshub_metadata_path):
+                        self.logger.info(f"✓ Metadata uploaded to DagsHub: {dagshub_metadata_path}")
+                        result['dagshub_metadata_path'] = dagshub_metadata_path
                     
                 except Exception as e:
-                    self.logger.warning(f"S3 upload failed: {e}")
-            elif save_to_s3 and not self.s3_enabled:
-                self.logger.info("S3 upload requested but S3 not configured - data saved locally only")
+                    self.logger.warning(f"DagsHub upload failed: {e}")
+            elif save_to_dagshub and not self.dagshub_enabled:
+                self.logger.info("DagsHub upload requested but not configured - data saved locally only")
             
             return result
             
@@ -478,7 +482,7 @@ class StockDataIngestion:
         symbol: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-        save_to_s3: bool = False
+        save_to_dagshub: bool = False
     ) -> Dict[str, Any]:
         """
         Run the complete data ingestion pipeline.
@@ -486,13 +490,13 @@ class StockDataIngestion:
         This is the main entry point that orchestrates:
         1. Data fetching from source
         2. Data validation
-        3. Saving to local and cloud storage
+        3. Saving to local and DagsHub storage
         
         Args:
             symbol: Stock ticker symbol
             start_date: Start date string
             end_date: End date string
-            save_to_s3: Whether to upload to S3
+            save_to_dagshub: Whether to upload to DagsHub
             
         Returns:
             Dictionary with pipeline results
@@ -512,7 +516,13 @@ class StockDataIngestion:
             
             # Step 2: Save data
             symbol = symbol or self.config['data_ingestion']['stock_symbol']
-            file_paths = self.save_data(df, metadata, symbol, save_to_s3)
+            
+            # Auto-enable DagsHub upload if configured
+            if not save_to_dagshub:
+                dagshub_config = self.config.get('dagshub_storage', {})
+                save_to_dagshub = dagshub_config.get('save_to_dagshub', False)
+            
+            file_paths = self.save_data(df, metadata, symbol, save_to_dagshub)
             
             # Calculate pipeline metrics
             pipeline_duration = time.time() - pipeline_start
