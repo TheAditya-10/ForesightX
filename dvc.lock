@@ -13,60 +13,60 @@ stages:
       size: 6927
     params:
       params.yaml:
-        data_ingestion.end_date: '2025-12-19'
+        data_ingestion.end_date: '2025-12-20'
         data_ingestion.source: yfinance
         data_ingestion.start_date: '2015-01-01'
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
     outs:
-    - path: data/raw/stock_data_raw_TATAMOTORS.BO.csv
+    - path: data/raw/stock_data_raw_NVDA.csv
       hash: md5
-      md5: 63beaa155f01069c24b5618e5cc01bba
-      size: 305045
+      md5: f4c5422a505c31a1e1d6980dedeb587b
+      size: 325740
   data_preprocessing:
     cmd: python src/data/preprocess.py
     deps:
-    - path: data/raw/stock_data_raw_TATAMOTORS.BO.csv
+    - path: data/raw/stock_data_raw_NVDA.csv
       hash: md5
-      md5: 63beaa155f01069c24b5618e5cc01bba
-      size: 305045
+      md5: f4c5422a505c31a1e1d6980dedeb587b
+      size: 325740
     - path: src/data/preprocess.py
       hash: md5
       md5: 7c5b8252a97aaaa5f622492bb43b439a
       size: 25662
     params:
       params.yaml:
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
         preprocessing.handle_missing: ffill
         preprocessing.outlier_method: iqr
         preprocessing.outlier_threshold: 3.0
         preprocessing.remove_outliers: false
     outs:
-    - path: data/processed/test_data_TATAMOTORS.BO.csv
+    - path: data/processed/test_data_NVDA.csv
       hash: md5
-      md5: 3a73501180aa8ce4c3e0a689e566a366
-      size: 73897
-    - path: data/processed/train_data_TATAMOTORS.BO.csv
+      md5: e43d6d0e702dc4d3f87acf0a197f3950
+      size: 81149
+    - path: data/processed/train_data_NVDA.csv
       hash: md5
-      md5: 235408a54088acd8a80e268512fe8fa8
-      size: 230002
+      md5: 305c5d4a1e2fd80dbd48d5d4c1dfbc31
+      size: 243565
   feature_engineering:
     cmd: python src/features/build_features.py
     deps:
-    - path: data/processed/test_data_TATAMOTORS.BO.csv
+    - path: data/processed/test_data_NVDA.csv
       hash: md5
-      md5: 3a73501180aa8ce4c3e0a689e566a366
-      size: 73897
-    - path: data/processed/train_data_TATAMOTORS.BO.csv
+      md5: e43d6d0e702dc4d3f87acf0a197f3950
+      size: 81149
+    - path: data/processed/train_data_NVDA.csv
       hash: md5
-      md5: 235408a54088acd8a80e268512fe8fa8
-      size: 230002
+      md5: 305c5d4a1e2fd80dbd48d5d4c1dfbc31
+      size: 243565
     - path: src/features/build_features.py
       hash: md5
       md5: d921847cdda254c20ccfd772ed4476ae
       size: 34728
     params:
       params.yaml:
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
         feature_engineering.atr_windows:
         - 14
         - 21
@@ -112,16 +112,16 @@ stages:
     outs:
     - path: data/features
       hash: md5
-      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
-      size: 3171271
+      md5: dd5daa17edb295d18a655569b875d08f.dir
+      size: 3349325
       nfiles: 1
   train_model:
     cmd: python src/model/train_model.py
     deps:
     - path: data/features
       hash: md5
-      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
-      size: 3171271
+      md5: dd5daa17edb295d18a655569b875d08f.dir
+      size: 3349325
       nfiles: 1
     - path: src/model/train_model.py
       hash: md5
@@ -129,7 +129,7 @@ stages:
       size: 21070
     params:
       params.yaml:
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
         models.mlp.activation: relu
         models.mlp.early_stopping: true
         models.mlp.hidden_layer_sizes:
@@ -146,7 +146,7 @@ stages:
     outs:
     - path: models
       hash: md5
-      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      md5: 4c0f3620eee749e9a394d6ac484c559e.dir
       size: 505916
       nfiles: 2
   evaluate_model:
@@ -154,12 +154,12 @@ stages:
     deps:
     - path: data/features
       hash: md5
-      md5: 7f6362c94e6d5796ed95c84c8c52de7d.dir
-      size: 3171271
+      md5: dd5daa17edb295d18a655569b875d08f.dir
+      size: 3349325
       nfiles: 1
     - path: models
       hash: md5
-      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      md5: 4c0f3620eee749e9a394d6ac484c559e.dir
       size: 505916
       nfiles: 2
     - path: src/model/evaluate_model.py
@@ -168,7 +168,7 @@ stages:
       size: 28377
     params:
       params.yaml:
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
         evaluation.metrics:
         - RMSE
         - MAE
@@ -183,20 +183,20 @@ stages:
     outs:
     - path: results
       hash: md5
-      md5: 5c36275d5315b7eb509895d742db2b80.dir
-      size: 49403
+      md5: ddce4248c1ba1e46f05cf8370dfb0c95.dir
+      size: 50679
       nfiles: 2
   register_model:
     cmd: python src/model/model_registry.py
     deps:
     - path: metadata
       hash: md5
-      md5: c08217d752225ecdcc34efea5888b68b.dir
-      size: 28701
-      nfiles: 15
+      md5: f00fa1a7f442e3eef046097a17c8983f.dir
+      size: 36247
+      nfiles: 19
     - path: models
       hash: md5
-      md5: 648ca1450bfc3fd012ec1bcc99cb242d.dir
+      md5: 4c0f3620eee749e9a394d6ac484c559e.dir
       size: 505916
       nfiles: 2
     - path: src/model/model_registry.py
@@ -205,7 +205,7 @@ stages:
       size: 24826
     params:
       params.yaml:
-        data_ingestion.stock_symbol: TATAMOTORS.BO
+        data_ingestion.stock_symbol: NVDA
         mlflow.dagshub_repo: ForesightX
         mlflow.dagshub_username: TheAditya-10
         mlflow.enabled: true
