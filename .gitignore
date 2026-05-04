@@ -1,0 +1,53 @@
+# Node modules
+node_modules/
+
+# Docusaurus build output and caches
+build/
+.docusaurus/
+.cache/
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Local environment files
+.env
+.env.*.local
+local.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Test coverage
+coverage/
+
+# Build/distribution directories
+dist/
+
+# Misc
+.parcel-cache/
+.sass-cache/
+*.tmp
+*.temp
+
+# Yarn PnP
+.pnp.*
+
+# Netlify local files
+.netlify/
+
