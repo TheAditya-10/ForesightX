@@ -3,6 +3,15 @@
  * Replace placeholders like [GITHUB_REPO_LINK] and [LIVE_DEMO_LINK] when available.
  */
 
+const documentationUrl = process.env.DOCUMENTATION_URL;
+const navbarItems = [
+  { to: 'docs/overview', label: 'Docs', position: 'left' },
+  { to: 'docs/microservices', label: 'Microservices', position: 'left' },
+  { to: 'docs/architecture', label: 'Architecture', position: 'left' },
+  ...(documentationUrl ? [{ href: documentationUrl, label: 'Documentation', position: 'right' }] : []),
+  { href: 'https://example.com', label: 'GitHub', position: 'right' }
+];
+
 module.exports = {
   title: 'ForesightX',
   tagline: 'Predictive analytics platform for financial foresight',
@@ -41,12 +50,7 @@ module.exports = {
         alt: 'ForesightX Logo',
         src: 'img/logo.svg'
       },
-      items: [
-        { to: 'docs/overview', label: 'Docs', position: 'left' },
-        { to: 'docs/microservices', label: 'Microservices', position: 'left' },
-        { to: 'docs/architecture', label: 'Architecture', position: 'left' },
-        { href: 'https://example.com', label: 'GitHub', position: 'right' }
-      ]
+      items: navbarItems
     },
     footer: {
       style: 'light',
