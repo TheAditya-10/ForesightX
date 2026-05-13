@@ -1,0 +1,84 @@
+@startuml ForesightX_System_Architecture
+title ForesightX System Architecture
+
+skinparam backgroundColor #F8FAFC
+skinparam defaultFontName Inter
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.5
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #CBD5E1
+  FontColor #0F172A
+}
+skinparam database {
+  BackgroundColor #F8FAFC
+  BorderColor #64748B
+  FontColor #0F172A
+}
+skinparam cloud {
+  BackgroundColor #ECFEFF
+  BorderColor #0891B2
+  FontColor #164E63
+}
+
+actor "Trader / Analyst" as user
+
+node "Client Layer" #E0F2FE {
+  component "ForesightX Frontend\nReact + Vite + Tailwind\nnginx container :8080" as frontend
+}
+
+node "Backend Microservices" #F0FDFA {
+  component "Auth Service\nFastAPI :8004\nJWT, OAuth, sessions" as auth
+  component "Orchestration Service\nFastAPI + LangGraph :8000\nanalysis jobs, decisions, risk" as orchestration
+  component "Data Service\nFastAPI :8001\nprices, history, indicators, news, stream" as data
+  component "Profile Service\nFastAPI :8002\nprofiles, portfolio, risk" as profile
+  component "Pattern Service\nFastAPI :8003\nML prediction API" as pattern
+}
+
+database "Auth Postgres\nusers, identity" as authdb
+database "Orchestration Postgres\nanalysis_jobs, events" as orchestrationdb
+database "Data Postgres\ninstruments, prices,\nindicators, news" as datadb
+database "Profile Postgres\nprofiles, positions,\ntransactions" as profiledb
+database "Pattern Postgres\nmodel metadata,\ninference records" as patterndb
+database "Redis 7\nsessions, blacklist,\nmarket cache" as redis
+
+cloud "Google OAuth" as google
+cloud "Yahoo Finance / Finnhub" as markets
+cloud "Gemini API" as gemini
+cloud "DVC + MLflow / S3\nmodel artifacts, avatars" as artifacts
+
+user --> frontend : HTTPS UI
+frontend --> auth : /api/auth/*
+frontend --> orchestration : /api/orchestration/*
+frontend --> data : /api/data/*
+frontend --> profile : /api/profile/*
+frontend --> pattern : /api/pattern/*
+
+auth --> authdb : identity CRUD
+auth --> redis : refresh sessions,\naccess-token blacklist
+auth --> profile : POST /profiles\nprofile bootstrap
+auth --> google : OAuth authorize/callback
+
+orchestration --> orchestrationdb : job state + trace events
+orchestration --> data : price, indicators,\nnews, instrument search
+orchestration --> profile : portfolio + risk context
+orchestration --> pattern : POST /predict
+orchestration --> gemini : structured decision\nwith fallback
+
+data --> redis : response cache
+data --> datadb : normalized market data
+data --> markets : price/history/news feeds
+
+profile --> profiledb : profile + portfolio state
+profile --> data : current prices for holdings/trades
+profile --> artifacts : optional avatar storage
+
+pattern --> patterndb : model metadata
+pattern --> data : latest bars for inference
+pattern --> artifacts : model.pt, scaler.pkl,\nmetadata.json, run metrics
+@enduml

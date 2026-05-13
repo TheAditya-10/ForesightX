@@ -5,7 +5,7 @@ title: Architecture
 
 # System Architecture
 
-This page summarizes the high-level architecture for ForesightX and includes placeholders for diagrams.
+This page summarizes the high-level architecture for ForesightX. Full UML source files and larger rendered diagrams are available on the [UML Diagrams](./diagrams) page.
 
 ## High-level structure
 
@@ -35,8 +35,14 @@ This page summarizes the high-level architecture for ForesightX and includes pla
 - CI builds images and pushes to a registry (ECR)
 - AWS targets: ECS/Fargate + RDS + S3; CloudFront for frontend
 
-## Diagrams (placeholders)
+## Architecture diagram
 
-- Architecture diagram: [ARCHITECTURE_DIAGRAM_DRAWIO]
-- Request flow: [REQUEST_FLOW_DIAGRAM_DRAWIO]
-- Deployment architecture: [DEPLOYMENT_ARCHITECTURE_DIAGRAM_DRAWIO]
+![ForesightX system architecture](/img/diagrams/system-architecture.svg)
+
+## Request flow diagram
+
+![ForesightX trading analysis sequence](/img/diagrams/trading-analysis-sequence.svg)
+
+## Collaboration diagram
+
+![ForesightX service collaboration](/img/diagrams/service-collaboration.svg)

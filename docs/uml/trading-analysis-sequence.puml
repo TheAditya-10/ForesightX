@@ -1,0 +1,85 @@
+@startuml ForesightX_Trading_Analysis_Sequence
+title ForesightX Core Trading Analysis Sequence
+
+skinparam backgroundColor #F8FAFC
+skinparam defaultFontName Inter
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam sequence {
+  ArrowColor #475569
+  ActorBorderColor #0F766E
+  ActorBackgroundColor #CCFBF1
+  LifeLineBorderColor #94A3B8
+  LifeLineBackgroundColor #FFFFFF
+  ParticipantBorderColor #CBD5E1
+  ParticipantBackgroundColor #FFFFFF
+  BoxBorderColor #CBD5E1
+  BoxBackgroundColor #F1F5F9
+  GroupBorderColor #94A3B8
+  GroupBackgroundColor #FFFFFF
+}
+
+actor User
+participant "Frontend\nReact/nginx" as FE
+participant "Auth Service\n:8004" as Auth
+database "Auth DB" as AuthDB
+database "Redis" as Redis
+participant "Profile Service\n:8002" as Profile
+participant "Orchestration\n:8000" as Orch
+database "Job DB" as JobDB
+participant "Data Service\n:8001" as Data
+participant "Pattern Service\n:8003" as Pattern
+participant "Gemini API" as Gemini
+
+User -> FE : Sign up or sign in
+FE -> Auth : POST /auth/sign-up or /auth/sign-in
+Auth -> AuthDB : validate/create user
+Auth -> Redis : create refresh session
+opt first registration or OAuth login
+  Auth -> Profile : POST /profiles
+  Profile --> Auth : profile created/existing
+end
+Auth --> FE : user + access/refresh tokens
+
+User -> FE : Search instrument
+FE -> Orch : GET /instruments/search
+Orch -> Data : GET /instruments/search
+Data --> Orch : ranked tickers
+Orch --> FE : search results
+
+User -> FE : Request recommendation
+FE -> Orch : POST /analyze\nuser_id, ticker, event
+Orch -> JobDB : create analysis_job(status=running)
+Orch -> Orch : event_node validates request
+
+group data_fetch_node in parallel
+  Orch -> Data : GET /price/{ticker}
+  Data --> Orch : latest price
+  Orch -> Data : GET /indicators/{ticker}
+  Data --> Orch : RSI + MACD
+  Orch -> Data : GET /news/{ticker}
+  Data --> Orch : headlines
+  Orch -> Pattern : POST /predict
+  Pattern --> Orch : model signal + confidence
+end
+
+Orch -> Orch : score sentiment + combine market signals
+Orch -> Profile : GET /portfolio/{user_id}
+Profile --> Orch : cash, holdings, risk level
+Orch -> Gemini : structured decision prompt
+alt Gemini unavailable or invalid
+  Orch -> Orch : deterministic fallback suggestion
+else Gemini decision accepted
+  Gemini --> Orch : BUY / SELL / HOLD JSON
+end
+Orch -> Orch : risk_check_node applies exposure and volatility limits
+Orch -> JobDB : persist action + ordered trace events
+Orch --> FE : recommendation + confidence + reasons + job_id
+
+opt user accepts trade
+  FE -> Profile : POST /portfolio/update
+  Profile -> Data : GET /price/{ticker}
+  Profile -> Profile : validate cash/position and compute P&L
+  Profile --> FE : updated portfolio
+end
+@enduml

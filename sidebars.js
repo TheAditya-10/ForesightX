@@ -2,6 +2,7 @@ module.exports = {
   docs: [
     'overview',
     'architecture',
+    'diagrams',
     {
       type: 'category',
       label: 'Microservices',

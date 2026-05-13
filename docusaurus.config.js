@@ -30,6 +30,11 @@ module.exports = {
     ]
   ],
   themeConfig: {
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
+    },
     navbar: {
       title: 'ForesightX',
       logo: {
@@ -44,7 +49,7 @@ module.exports = {
       ]
     },
     footer: {
-      style: 'dark',
+      style: 'light',
       links: [
         {
           title: 'Platform',

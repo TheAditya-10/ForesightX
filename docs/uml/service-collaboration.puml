@@ -1,0 +1,57 @@
+@startuml ForesightX_Service_Collaboration
+title ForesightX UML Communication / Collaboration Diagram
+
+skinparam backgroundColor #F8FAFC
+skinparam defaultFontName Inter
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.5
+skinparam object {
+  BackgroundColor #FFFFFF
+  BorderColor #CBD5E1
+  FontColor #0F172A
+}
+
+object "Trader / Analyst" as User #CCFBF1
+object "Frontend SPA\nReact + nginx" as FE #E0F2FE
+object "Auth Service\nJWT, OAuth, sessions" as Auth #DCFCE7
+object "Orchestration Service\nLangGraph workflow" as Orch #FEF3C7
+object "Data Service\nmarket data + news" as Data #DBEAFE
+object "Profile Service\nportfolio + risk" as Profile #EDE9FE
+object "Pattern Service\nML predictions" as Pattern #FFE4E6
+database "Redis\nsessions + cache" as Redis #F1F5F9
+database "Service-owned\nPostgres DBs" as DBs #F8FAFC
+object "External Providers\nGoogle, Yahoo/Finnhub,\nGemini, DVC/MLflow/S3" as External #ECFEFF
+
+User --> FE : 1. Uses dashboard
+FE --> Auth : 1.1 sign-up/sign-in
+Auth --> DBs : 1.2 create/read user
+Auth --> Redis : 1.3 issue refresh session\nand blacklist revoked JTIs
+Auth --> Profile : 1.4 bootstrap profile
+Auth --> External : 1.5 Google OAuth
+
+FE --> Orch : 2. request instrument search\nor recommendation
+Orch --> Data : 2.1 instrument search
+Data --> External : 2.2 Yahoo/Finnhub lookup
+Data --> Redis : 2.3 cache response
+Data --> DBs : 2.4 persist normalized data
+
+FE --> Orch : 3. POST /analyze
+Orch --> DBs : 3.1 create analysis job
+Orch --> Data : 3.2 price, indicators, news
+Orch --> Pattern : 3.3 POST /predict
+Pattern --> Data : 3.3.1 latest bars if needed
+Pattern --> External : 3.3.2 load artifacts from DVC/MLflow/S3
+Orch --> Profile : 3.4 portfolio + risk
+Profile --> Data : 3.4.1 current holding prices
+Orch --> External : 3.5 Gemini decision
+Orch --> DBs : 3.6 persist trace events
+Orch --> FE : 3.7 action, confidence, reasons
+
+FE --> Profile : 4. portfolio update
+Profile --> Data : 4.1 price trade
+Profile --> DBs : 4.2 transaction + positions
+Profile --> FE : 4.3 refreshed portfolio
+@enduml

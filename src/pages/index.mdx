@@ -1,72 +1,69 @@
 import React from 'react';
-import Layout from '@theme/Layout';
 
 export default function Home() {
   return (
-    <Layout title="ForesightX" description="Predictive analytics platform for financial foresight">
-      <main className="landing-hero">
-        <div className="container hero-inner">
-          <h1 className="hero-title">ForesightX</h1>
-          <p className="hero-sub">Production-ready predictive analytics platform for market forecasting and automated deployment.</p>
+    <main className="landing-hero">
+      <div className="container hero-inner">
+        <h1 className="hero-title">ForesightX</h1>
+        <p className="hero-sub">Production-ready predictive analytics platform for market forecasting and automated deployment.</p>
 
-          <div className="hero-ctas">
-            <a className="btn primary" href="[LIVE_DEMO_LINK]">Live demo</a>
-            <a className="btn outline" href="[GITHUB_REPO_LINK]">View repo</a>
-            <a className="btn" href="[VIDEO_DEMO_LINK]">Watch demo</a>
-          </div>
-
-          <section className="features">
-            <h2>What problem we solve</h2>
-            <p>ForesightX provides a reproducible pipeline for ingesting market data, training predictive models, and serving inference in production with a microservice architecture—reducing time-to-insight for quantitative teams.</p>
-
-            <div className="feature-grid">
-              <div className="card">
-                <h3>Key features</h3>
-                <ul>
-                  <li>Modular microservices (data, auth, profile, orchestration, ML)</li>
-                  <li>Production model serving and monitoring</li>
-                  <li>Containerized deployments and CI/CD</li>
-                </ul>
-              </div>
-              <div className="card">
-                <h3>Major technologies</h3>
-                <ul>
-                  <li>Python (FastAPI), Postgres, Redis</li>
-                  <li>ML: PyTorch, scikit-learn, DVC, MLflow</li>
-                  <li>Frontend: React, Vite, Tailwind</li>
-                  <li>Deployment: Docker, AWS (S3 / ECS / ECR / RDS), GitHub Actions</li>
-                </ul>
-              </div>
-              <div className="card">
-                <h3>Architecture highlights</h3>
-                <ul>
-                  <li>LangGraph-based decision engine with Gemini integration</li>
-                  <li>Service-owned databases with clean boundaries</li>
-                  <li>Real-time data streaming for tick updates</li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <section className="media">
-            <h2>Demo</h2>
-            <div className="media-grid">
-              <div className="video-placeholder">Demo video placeholder — <a href="[VIDEO_DEMO_LINK]">[VIDEO_DEMO_LINK]</a></div>
-              <img src="/img/architecture.svg" alt="Architecture placeholder" className="diagram" />
-            </div>
-          </section>
-
-          <section className="links">
-            <h2>Quick links</h2>
-            <div className="link-cards">
-              <a className="link-card" href="[LIVE_DEMO_LINK]">Live Demo</a>
-              <a className="link-card" href="[GITHUB_REPO_LINK]">GitHub Repo</a>
-              <a className="link-card" href="[API_DOCS_LINK]">API Docs</a>
-              <a className="link-card" href="[AWS_DEPLOYMENT_LINK]">AWS Deployment</a>
-            </div>
-          </section>
+        <div className="hero-ctas">
+          <a className="btn primary" href="[LIVE_DEMO_LINK]">Live demo</a>
+          <a className="btn outline" href="[GITHUB_REPO_LINK]">View repo</a>
+          <a className="btn" href="[VIDEO_DEMO_LINK]">Watch demo</a>
         </div>
-      </main>
-    </Layout>
+
+        <section className="features">
+          <h2>What problem we solve</h2>
+          <p>ForesightX provides a reproducible pipeline for ingesting market data, training predictive models, and serving inference in production with a microservice architecture—reducing time-to-insight for quantitative teams.</p>
+
+          <div className="feature-grid">
+            <div className="card">
+              <h3>Key features</h3>
+              <ul>
+                <li>Modular microservices (data, auth, profile, orchestration, ML)</li>
+                <li>Production model serving and monitoring</li>
+                <li>Containerized deployments and CI/CD</li>
+              </ul>
+            </div>
+            <div className="card">
+              <h3>Major technologies</h3>
+              <ul>
+                <li>Python (FastAPI), Postgres, Redis</li>
+                <li>ML: PyTorch, scikit-learn, DVC, MLflow</li>
+                <li>Frontend: React, Vite, Tailwind</li>
+                <li>Deployment: Docker, AWS (S3 / ECS / ECR / RDS), GitHub Actions</li>
+              </ul>
+            </div>
+            <div className="card">
+              <h3>Architecture highlights</h3>
+              <ul>
+                <li>LangGraph-based decision engine with Gemini integration</li>
+                <li>Service-owned databases with clean boundaries</li>
+                <li>Real-time data streaming for tick updates</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="media">
+          <h2>Demo</h2>
+          <div className="media-grid">
+            <div className="video-placeholder">Demo video placeholder — <a href="[VIDEO_DEMO_LINK]">[VIDEO_DEMO_LINK]</a></div>
+            <img src="/img/architecture.svg" alt="Architecture placeholder" className="diagram" />
+          </div>
+        </section>
+
+        <section className="links">
+          <h2>Quick links</h2>
+          <div className="link-cards">
+            <a className="link-card" href="[LIVE_DEMO_LINK]">Live Demo</a>
+            <a className="link-card" href="[GITHUB_REPO_LINK]">GitHub Repo</a>
+            <a className="link-card" href="[API_DOCS_LINK]">API Docs</a>
+            <a className="link-card" href="[AWS_DEPLOYMENT_LINK]">AWS Deployment</a>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }

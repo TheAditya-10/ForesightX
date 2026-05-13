@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1120" viewBox="0 0 1700 1120" role="img" aria-labelledby="title desc">
+  <title id="title">ForesightX trading analysis sequence diagram</title>
+  <desc id="desc">UML sequence diagram for authentication, instrument search, trading recommendation, and optional portfolio update.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 32px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px Inter, Segoe UI, Arial, sans-serif; fill: #475569; }
+      .head { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .head-auth { fill: #f0fdf4; stroke: #22c55e; stroke-width: 2; rx: 12; }
+      .head-orch { fill: #fffbeb; stroke: #f59e0b; stroke-width: 2; rx: 12; }
+      .head-data { fill: #eff6ff; stroke: #60a5fa; stroke-width: 2; rx: 12; }
+      .head-profile { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 2; rx: 12; }
+      .head-pattern { fill: #fff1f2; stroke: #fb7185; stroke-width: 2; rx: 12; }
+      .head-db { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; rx: 12; }
+      .htext { font: 700 13px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; text-anchor: middle; }
+      .lifeline { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 8 8; }
+      .activation { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1; rx: 5; }
+      .msg { stroke: #475569; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #64748b; stroke-width: 1.8; fill: none; stroke-dasharray: 7 6; marker-end: url(#arrowSoft); }
+      .self { stroke: #475569; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .label { font: 600 12px Inter, Segoe UI, Arial, sans-serif; fill: #334155; }
+      .group { fill: rgba(255,255,255,.72); stroke: #cbd5e1; stroke-width: 1.5; rx: 14; }
+      .group-title { font: 700 12px Inter, Segoe UI, Arial, sans-serif; fill: #475569; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1700" height="1120"/>
+  <text class="title" x="70" y="62">ForesightX Core Trading Analysis Sequence</text>
+  <text class="subtitle" x="70" y="90">End-to-end user flow across auth, profile bootstrap, search, LangGraph analysis, ML prediction, risk checks, and optional portfolio update.</text>
+
+  <g id="participants">
+    <rect class="head" x="46" y="124" width="105" height="58"/><text class="htext" x="98.5" y="149">User</text><text class="htext" x="98.5" y="166">Actor</text>
+    <rect class="head" x="190" y="124" width="130" height="58"/><text class="htext" x="255" y="149">Frontend</text><text class="htext" x="255" y="166">React/nginx</text>
+    <rect class="head-auth" x="360" y="124" width="130" height="58"/><text class="htext" x="425" y="149">Auth</text><text class="htext" x="425" y="166">:8004</text>
+    <rect class="head-db" x="536" y="124" width="112" height="58"/><text class="htext" x="592" y="149">Auth DB</text><text class="htext" x="592" y="166">Postgres</text>
+    <rect class="head-db" x="690" y="124" width="100" height="58"/><text class="htext" x="740" y="149">Redis</text><text class="htext" x="740" y="166">cache</text>
+    <rect class="head-profile" x="830" y="124" width="135" height="58"/><text class="htext" x="897.5" y="149">Profile</text><text class="htext" x="897.5" y="166">:8002</text>
+    <rect class="head-orch" x="1005" y="124" width="155" height="58"/><text class="htext" x="1082.5" y="149">Orchestration</text><text class="htext" x="1082.5" y="166">:8000</text>
+    <rect class="head-db" x="1205" y="124" width="105" height="58"/><text class="htext" x="1257.5" y="149">Job DB</text><text class="htext" x="1257.5" y="166">Postgres</text>
+    <rect class="head-data" x="1350" y="124" width="115" height="58"/><text class="htext" x="1407.5" y="149">Data</text><text class="htext" x="1407.5" y="166">:8001</text>
+    <rect class="head-pattern" x="1505" y="124" width="120" height="58"/><text class="htext" x="1565" y="149">Pattern</text><text class="htext" x="1565" y="166">:8003</text>
+    <rect class="head" x="65" y="1010" width="75" height="48"/><text class="htext" x="102.5" y="1038">User</text>
+    <rect class="head" x="202" y="1010" width="106" height="48"/><text class="htext" x="255" y="1038">Frontend</text>
+    <rect class="head-auth" x="372" y="1010" width="106" height="48"/><text class="htext" x="425" y="1038">Auth</text>
+    <rect class="head-db" x="545" y="1010" width="94" height="48"/><text class="htext" x="592" y="1038">Auth DB</text>
+    <rect class="head-db" x="700" y="1010" width="80" height="48"/><text class="htext" x="740" y="1038">Redis</text>
+    <rect class="head-profile" x="844" y="1010" width="107" height="48"/><text class="htext" x="897.5" y="1038">Profile</text>
+    <rect class="head-orch" x="1024" y="1010" width="117" height="48"/><text class="htext" x="1082.5" y="1038">Orch</text>
+    <rect class="head-db" x="1215" y="1010" width="85" height="48"/><text class="htext" x="1257.5" y="1038">Job DB</text>
+    <rect class="head-data" x="1365" y="1010" width="85" height="48"/><text class="htext" x="1407.5" y="1038">Data</text>
+    <rect class="head-pattern" x="1520" y="1010" width="90" height="48"/><text class="htext" x="1565" y="1038">Pattern</text>
+  </g>
+
+  <g id="lifelines">
+    <line class="lifeline" x1="98.5" y1="182" x2="98.5" y2="1010"/>
+    <line class="lifeline" x1="255" y1="182" x2="255" y2="1010"/>
+    <line class="lifeline" x1="425" y1="182" x2="425" y2="1010"/>
+    <line class="lifeline" x1="592" y1="182" x2="592" y2="1010"/>
+    <line class="lifeline" x1="740" y1="182" x2="740" y2="1010"/>
+    <line class="lifeline" x1="897.5" y1="182" x2="897.5" y2="1010"/>
+    <line class="lifeline" x1="1082.5" y1="182" x2="1082.5" y2="1010"/>
+    <line class="lifeline" x1="1257.5" y1="182" x2="1257.5" y2="1010"/>
+    <line class="lifeline" x1="1407.5" y1="182" x2="1407.5" y2="1010"/>
+    <line class="lifeline" x1="1565" y1="182" x2="1565" y2="1010"/>
+  </g>
+
+  <rect class="group" x="38" y="210" width="960" height="190"/><text class="group-title" x="56" y="232">Authentication and profile bootstrap</text>
+  <path class="msg" d="M98.5 260 L255 260"/><text class="label" x="126" y="252">sign up or sign in</text>
+  <path class="msg" d="M255 292 L425 292"/><text class="label" x="278" y="284">POST /auth/sign-up or /auth/sign-in</text>
+  <path class="msg" d="M425 324 L592 324"/><text class="label" x="450" y="316">validate/create user</text>
+  <path class="msg" d="M425 352 L740 352"/><text class="label" x="488" y="344">create refresh session</text>
+  <path class="msg" d="M425 378 L897.5 378"/><text class="label" x="536" y="370">optional POST /profiles</text>
+  <path class="return" d="M425 394 L255 394"/><text class="label" x="286" y="410">user + tokens</text>
+
+  <rect class="group" x="980" y="210" width="560" height="138"/><text class="group-title" x="998" y="232">Instrument search</text>
+  <path class="msg" d="M255 456 L1082.5 456"/><text class="label" x="512" y="448">GET /api/orchestration/instruments/search</text>
+  <path class="msg" d="M1082.5 488 L1407.5 488"/><text class="label" x="1150" y="480">GET /instruments/search</text>
+  <path class="return" d="M1407.5 520 L1082.5 520"/><text class="label" x="1180" y="536">ranked tickers</text>
+  <path class="return" d="M1082.5 552 L255 552"/><text class="label" x="526" y="568">search results</text>
+
+  <rect class="group" x="206" y="598" width="1450" height="300"/><text class="group-title" x="224" y="620">POST /analyze LangGraph workflow</text>
+  <path class="msg" d="M255 646 L1082.5 646"/><text class="label" x="530" y="638">POST /analyze: user_id, ticker, event</text>
+  <path class="msg" d="M1082.5 674 L1257.5 674"/><text class="label" x="1110" y="666">create job</text>
+  <path class="self" d="M1082.5 704 C1140 704, 1140 730, 1086 730"/><text class="label" x="1100" y="700">event_node validates</text>
+
+  <rect class="group" x="1010" y="744" width="628" height="104"/><text class="group-title" x="1028" y="766">data_fetch_node runs service tools in parallel</text>
+  <path class="msg" d="M1082.5 792 L1407.5 792"/><text class="label" x="1140" y="784">price, indicators, news</text>
+  <path class="return" d="M1407.5 818 L1082.5 818"/><text class="label" x="1170" y="835">market signals</text>
+  <path class="msg" d="M1082.5 846 L1565 846"/><text class="label" x="1210" y="865">POST /predict</text>
+  <path class="return" d="M1565 874 L1082.5 874"/><text class="label" x="1210" y="891">ML signal + confidence</text>
+
+  <path class="msg" d="M1082.5 918 L897.5 918"/><text class="label" x="914" y="910">GET /portfolio/{user_id}</text>
+  <path class="return" d="M897.5 944 L1082.5 944"/><text class="label" x="920" y="960">cash, holdings, risk</text>
+  <path class="self" d="M1082.5 974 C1148 974, 1148 1000, 1086 1000"/><text class="label" x="1100" y="970">Gemini decision or deterministic fallback; risk check; persist trace</text>
+
+  <path class="msg" d="M1082.5 918 C1190 918, 1190 930, 1257.5 930"/><text class="label" x="1165" y="913">trace events</text>
+  <path class="return" d="M1082.5 990 L255 990"/><text class="label" x="504" y="982">recommendation, confidence, reasons, job_id</text>
+
+  <rect class="group" x="215" y="908" width="736" height="82"/><text class="group-title" x="233" y="930">Optional accepted trade</text>
+  <path class="msg" d="M255 952 L897.5 952"/><text class="label" x="424" y="944">POST /api/profile/portfolio/update</text>
+  <path class="msg" d="M897.5 976 L1407.5 976"/><text class="label" x="1042" y="968">price trade</text>
+  <path class="return" d="M897.5 1000 L255 1000"/><text class="label" x="460" y="1016">updated portfolio</text>
+</svg>

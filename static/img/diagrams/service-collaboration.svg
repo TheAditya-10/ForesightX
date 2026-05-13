@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+  <title id="title">ForesightX service collaboration diagram</title>
+  <desc id="desc">UML communication diagram showing numbered collaborations between ForesightX services and external providers.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 32px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px Inter, Segoe UI, Arial, sans-serif; fill: #475569; }
+      .node { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 16; }
+      .user { fill: #ccfbf1; stroke: #0f766e; }
+      .frontend { fill: #eff6ff; stroke: #2563eb; }
+      .auth { fill: #f0fdf4; stroke: #16a34a; }
+      .orch { fill: #fffbeb; stroke: #d97706; }
+      .data { fill: #dbeafe; stroke: #2563eb; }
+      .profile { fill: #f5f3ff; stroke: #7c3aed; }
+      .pattern { fill: #fff1f2; stroke: #e11d48; }
+      .store { fill: #f8fafc; stroke: #64748b; }
+      .external { fill: #ecfeff; stroke: #0891b2; }
+      .node-title { font: 700 18px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; text-anchor: middle; }
+      .node-text { font: 500 13px Inter, Segoe UI, Arial, sans-serif; fill: #475569; text-anchor: middle; }
+      .link { stroke: #475569; stroke-width: 2.1; fill: none; marker-end: url(#arrow); }
+      .link-soft { stroke: #64748b; stroke-width: 1.8; fill: none; marker-end: url(#arrowSoft); }
+      .badge { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; rx: 9; }
+      .label { font: 700 12px Inter, Segoe UI, Arial, sans-serif; fill: #334155; }
+      .legend-title { font: 700 14px Inter, Segoe UI, Arial, sans-serif; fill: #334155; }
+      .legend-text { font: 500 12px Inter, Segoe UI, Arial, sans-serif; fill: #64748b; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1040"/>
+  <text class="title" x="70" y="64">ForesightX UML Collaboration Diagram</text>
+  <text class="subtitle" x="70" y="92">Numbered communication view of authentication, market search, recommendation analysis, prediction, risk context, and portfolio updates.</text>
+
+  <rect class="node user" x="98" y="170" width="190" height="92"/>
+  <text class="node-title" x="193" y="204">Trader / Analyst</text>
+  <text class="node-text" x="193" y="228">dashboard user</text>
+  <text class="node-text" x="193" y="248">searches, analyzes, trades</text>
+
+  <rect class="node frontend" x="410" y="150" width="230" height="116"/>
+  <text class="node-title" x="525" y="188">Frontend SPA</text>
+  <text class="node-text" x="525" y="213">React + Vite</text>
+  <text class="node-text" x="525" y="233">nginx /api proxy</text>
+  <text class="node-text" x="525" y="253">session token handling</text>
+
+  <rect class="node auth" x="235" y="390" width="230" height="116"/>
+  <text class="node-title" x="350" y="428">Auth Service</text>
+  <text class="node-text" x="350" y="453">JWT + OAuth</text>
+  <text class="node-text" x="350" y="473">refresh rotation</text>
+  <text class="node-text" x="350" y="493">profile bootstrap</text>
+
+  <rect class="node orch" x="672" y="360" width="270" height="138"/>
+  <text class="node-title" x="807" y="398">Orchestration Service</text>
+  <text class="node-text" x="807" y="423">LangGraph nodes</text>
+  <text class="node-text" x="807" y="443">analysis jobs + traces</text>
+  <text class="node-text" x="807" y="463">decision + risk check</text>
+  <text class="node-text" x="807" y="483">search proxy</text>
+
+  <rect class="node data" x="1088" y="218" width="236" height="126"/>
+  <text class="node-title" x="1206" y="258">Data Service</text>
+  <text class="node-text" x="1206" y="283">prices, history, bars</text>
+  <text class="node-text" x="1206" y="303">RSI, MACD, news</text>
+  <text class="node-text" x="1206" y="323">instrument search</text>
+
+  <rect class="node profile" x="1080" y="486" width="250" height="128"/>
+  <text class="node-title" x="1205" y="526">Profile Service</text>
+  <text class="node-text" x="1205" y="551">profiles, cash</text>
+  <text class="node-text" x="1205" y="571">positions, transactions</text>
+  <text class="node-text" x="1205" y="591">risk level and P&amp;L</text>
+
+  <rect class="node pattern" x="1092" y="750" width="240" height="116"/>
+  <text class="node-title" x="1212" y="788">Pattern Service</text>
+  <text class="node-text" x="1212" y="813">ML prediction API</text>
+  <text class="node-text" x="1212" y="833">confidence intervals</text>
+  <text class="node-text" x="1212" y="853">model version</text>
+
+  <rect class="node store" x="190" y="712" width="250" height="124"/>
+  <text class="node-title" x="315" y="750">Redis</text>
+  <text class="node-text" x="315" y="775">refresh sessions</text>
+  <text class="node-text" x="315" y="795">token blacklist</text>
+  <text class="node-text" x="315" y="815">market response cache</text>
+
+  <rect class="node store" x="610" y="698" width="300" height="148"/>
+  <text class="node-title" x="760" y="738">Service-owned Postgres</text>
+  <text class="node-text" x="760" y="763">auth users</text>
+  <text class="node-text" x="760" y="783">market data</text>
+  <text class="node-text" x="760" y="803">portfolio state</text>
+  <text class="node-text" x="760" y="823">analysis jobs and events</text>
+
+  <rect class="node external" x="690" y="138" width="290" height="108"/>
+  <text class="node-title" x="835" y="176">External Providers</text>
+  <text class="node-text" x="835" y="201">Google OAuth</text>
+  <text class="node-text" x="835" y="221">Yahoo/Finnhub, Gemini</text>
+
+  <rect class="node external" x="1402" y="610" width="140" height="160"/>
+  <text class="node-title" x="1472" y="650">Artifacts</text>
+  <text class="node-text" x="1472" y="675">DVC</text>
+  <text class="node-text" x="1472" y="695">MLflow</text>
+  <text class="node-text" x="1472" y="715">S3</text>
+  <text class="node-text" x="1472" y="735">avatars</text>
+
+  <path class="link" d="M288 211 C335 205, 363 202, 410 202"/>
+  <rect class="badge" x="318" y="178" width="94" height="28"/><text class="label" x="328" y="197">1 use UI</text>
+
+  <path class="link" d="M493 266 C448 315, 404 352, 370 390"/>
+  <rect class="badge" x="422" y="306" width="114" height="28"/><text class="label" x="432" y="325">1.1 auth API</text>
+
+  <path class="link-soft" d="M350 506 C350 590, 332 652, 318 712"/>
+  <rect class="badge" x="338" y="590" width="144" height="28"/><text class="label" x="348" y="609">1.2 sessions</text>
+
+  <path class="link-soft" d="M465 450 C535 522, 590 640, 680 698"/>
+  <rect class="badge" x="500" y="557" width="118" height="28"/><text class="label" x="510" y="576">1.3 auth DB</text>
+
+  <path class="link-soft" d="M465 436 C645 446, 910 484, 1080 536"/>
+  <rect class="badge" x="585" y="418" width="150" height="28"/><text class="label" x="595" y="437">1.4 bootstrap</text>
+
+  <path class="link-soft" d="M448 390 C514 300, 610 232, 690 196"/>
+  <rect class="badge" x="520" y="260" width="126" height="28"/><text class="label" x="530" y="279">1.5 OAuth</text>
+
+  <path class="link" d="M640 208 C694 244, 744 300, 780 360"/>
+  <rect class="badge" x="642" y="276" width="168" height="28"/><text class="label" x="652" y="295">2 search/analyze</text>
+
+  <path class="link" d="M942 396 C1016 354, 1052 324, 1088 300"/>
+  <rect class="badge" x="984" y="332" width="152" height="28"/><text class="label" x="994" y="351">2.1 search data</text>
+
+  <path class="link-soft" d="M1206 218 C1126 156, 1010 148, 980 174"/>
+  <rect class="badge" x="1078" y="146" width="144" height="28"/><text class="label" x="1088" y="165">2.2 feeds</text>
+
+  <path class="link-soft" d="M1088 320 C820 435, 476 610, 340 712"/>
+  <rect class="badge" x="600" y="572" width="112" height="28"/><text class="label" x="610" y="591">2.3 cache</text>
+
+  <path class="link-soft" d="M1110 344 C990 490, 852 624, 790 698"/>
+  <rect class="badge" x="934" y="514" width="132" height="28"/><text class="label" x="944" y="533">2.4 persist</text>
+
+  <path class="link" d="M525 266 C574 330, 626 380, 672 412"/>
+  <rect class="badge" x="548" y="354" width="132" height="28"/><text class="label" x="558" y="373">3 POST analyze</text>
+
+  <path class="link-soft" d="M780 498 C770 560, 762 632, 760 698"/>
+  <rect class="badge" x="774" y="580" width="150" height="28"/><text class="label" x="784" y="599">3.1 create job</text>
+
+  <path class="link" d="M942 414 C1000 375, 1046 342, 1088 312"/>
+  <rect class="badge" x="958" y="386" width="194" height="28"/><text class="label" x="968" y="405">3.2 price/news/TA</text>
+
+  <path class="link" d="M910 498 C996 604, 1084 704, 1140 750"/>
+  <rect class="badge" x="988" y="630" width="134" height="28"/><text class="label" x="998" y="649">3.3 predict</text>
+
+  <path class="link" d="M942 456 C994 486, 1038 512, 1080 534"/>
+  <rect class="badge" x="974" y="490" width="170" height="28"/><text class="label" x="984" y="509">3.4 portfolio/risk</text>
+
+  <path class="link-soft" d="M1080 560 C1014 558, 994 506, 942 468"/>
+  <rect class="badge" x="950" y="544" width="164" height="28"/><text class="label" x="960" y="563">3.4.1 prices</text>
+
+  <path class="link-soft" d="M832 360 C832 314, 833 278, 834 246"/>
+  <rect class="badge" x="845" y="292" width="156" height="28"/><text class="label" x="855" y="311">3.5 Gemini</text>
+
+  <path class="link-soft" d="M807 498 C796 560, 778 636, 768 698"/>
+  <rect class="badge" x="800" y="620" width="150" height="28"/><text class="label" x="810" y="639">3.6 trace events</text>
+
+  <path class="link" d="M672 426 C612 385, 566 328, 536 266"/>
+  <rect class="badge" x="552" y="332" width="164" height="28"/><text class="label" x="562" y="351">3.7 response</text>
+
+  <path class="link" d="M640 246 C770 330, 956 458, 1080 544"/>
+  <rect class="badge" x="760" y="300" width="176" height="28"/><text class="label" x="770" y="319">4 portfolio update</text>
+
+  <path class="link-soft" d="M1205 486 C1212 434, 1210 390, 1208 344"/>
+  <rect class="badge" x="1218" y="410" width="112" height="28"/><text class="label" x="1228" y="429">4.1 price</text>
+
+  <path class="link-soft" d="M1080 602 C986 664, 914 706, 880 724"/>
+  <rect class="badge" x="940" y="674" width="130" height="28"/><text class="label" x="950" y="693">4.2 persist</text>
+
+  <path class="link-soft" d="M1212 750 C1284 688, 1350 646, 1402 638"/>
+  <rect class="badge" x="1260" y="684" width="148" height="28"/><text class="label" x="1270" y="703">3.3.2 artifacts</text>
+
+  <rect class="node store" x="80" y="900" width="430" height="70"/>
+  <text class="legend-title" x="104" y="928">Read order</text>
+  <text class="legend-text" x="104" y="950">Numbers show the main collaboration sequence. Decimal steps are service-to-service calls within that parent flow.</text>
+</svg>

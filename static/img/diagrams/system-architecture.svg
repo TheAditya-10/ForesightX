@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050" role="img" aria-labelledby="title desc">
+  <title id="title">ForesightX system architecture</title>
+  <desc id="desc">Layered architecture diagram for the ForesightX microservice trading analytics platform.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 34px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 16px Inter, Segoe UI, Arial, sans-serif; fill: #475569; }
+      .band-title { font: 700 18px Inter, Segoe UI, Arial, sans-serif; fill: #334155; letter-spacing: .2px; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
+      .card-blue { fill: #eff6ff; stroke: #60a5fa; stroke-width: 2; rx: 14; }
+      .card-teal { fill: #f0fdfa; stroke: #14b8a6; stroke-width: 2; rx: 14; }
+      .card-green { fill: #f0fdf4; stroke: #22c55e; stroke-width: 2; rx: 14; }
+      .card-amber { fill: #fffbeb; stroke: #f59e0b; stroke-width: 2; rx: 14; }
+      .card-rose { fill: #fff1f2; stroke: #fb7185; stroke-width: 2; rx: 14; }
+      .card-violet { fill: #f5f3ff; stroke: #8b5cf6; stroke-width: 2; rx: 14; }
+      .card-slate { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; rx: 14; }
+      .node-title { font: 700 17px Inter, Segoe UI, Arial, sans-serif; fill: #0f172a; }
+      .node-text { font: 500 13px Inter, Segoe UI, Arial, sans-serif; fill: #475569; }
+      .small { font: 600 12px Inter, Segoe UI, Arial, sans-serif; fill: #64748b; }
+      .arrow { fill: none; stroke: #475569; stroke-width: 2.2; marker-end: url(#arrow); }
+      .arrow-soft { fill: none; stroke: #64748b; stroke-width: 1.8; marker-end: url(#arrowSoft); }
+      .label { font: 700 12px Inter, Segoe UI, Arial, sans-serif; fill: #334155; }
+      .label-bg { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1; rx: 7; }
+      .band { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 20; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L9,5 L1,9 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1050"/>
+  <text class="title" x="70" y="70">ForesightX System Architecture</text>
+  <text class="subtitle" x="70" y="100">Microservice-based trading analytics platform with service-owned data, ML inference, orchestration, and external market intelligence.</text>
+
+  <rect class="band" x="58" y="128" width="1484" height="140"/>
+  <text class="band-title" x="82" y="164">Client Layer</text>
+  <rect class="card-blue" x="104" y="184" width="280" height="58"/>
+  <text class="node-title" x="126" y="209">Trader / Analyst</text>
+  <text class="node-text" x="126" y="229">dashboard, search, recommendations</text>
+  <rect class="card" x="594" y="174" width="410" height="78"/>
+  <text class="node-title" x="620" y="202">ForesightX Frontend</text>
+  <text class="node-text" x="620" y="224">React + Vite + Tailwind, served by nginx</text>
+  <text class="small" x="620" y="241">proxy routes: /api/auth, /api/data, /api/profile, /api/pattern, /api/orchestration</text>
+  <path class="arrow" d="M384 213 C460 213, 510 213, 594 213"/>
+  <rect class="label-bg" x="446" y="193" width="76" height="24"/>
+  <text class="label" x="462" y="210">HTTPS UI</text>
+
+  <rect class="band" x="58" y="306" width="1484" height="270"/>
+  <text class="band-title" x="82" y="342">Backend Microservices</text>
+  <rect class="card-green" x="98" y="380" width="250" height="108"/>
+  <text class="node-title" x="122" y="410">Auth Service :8004</text>
+  <text class="node-text" x="122" y="433">JWT access and refresh tokens</text>
+  <text class="node-text" x="122" y="453">Google OAuth</text>
+  <text class="node-text" x="122" y="473">profile bootstrap</text>
+
+  <rect class="card-amber" x="390" y="360" width="300" height="148"/>
+  <text class="node-title" x="414" y="390">Orchestration Service :8000</text>
+  <text class="node-text" x="414" y="413">FastAPI + LangGraph workflow</text>
+  <text class="node-text" x="414" y="433">analysis jobs and trace events</text>
+  <text class="node-text" x="414" y="453">Gemini decision with fallback</text>
+  <text class="node-text" x="414" y="473">risk checks and response assembly</text>
+
+  <rect class="card-blue" x="736" y="380" width="250" height="108"/>
+  <text class="node-title" x="760" y="410">Data Service :8001</text>
+  <text class="node-text" x="760" y="433">prices, history, bars</text>
+  <text class="node-text" x="760" y="453">RSI, MACD, news</text>
+  <text class="node-text" x="760" y="473">stream ingest + websocket</text>
+
+  <rect class="card-violet" x="1028" y="380" width="250" height="108"/>
+  <text class="node-title" x="1052" y="410">Profile Service :8002</text>
+  <text class="node-text" x="1052" y="433">profiles, cash balance</text>
+  <text class="node-text" x="1052" y="453">portfolio positions</text>
+  <text class="node-text" x="1052" y="473">risk preference and P&amp;L</text>
+
+  <rect class="card-rose" x="1320" y="380" width="180" height="108"/>
+  <text class="node-title" x="1342" y="410">Pattern :8003</text>
+  <text class="node-text" x="1342" y="433">ML inference</text>
+  <text class="node-text" x="1342" y="453">confidence intervals</text>
+  <text class="node-text" x="1342" y="473">model versioning</text>
+
+  <path class="arrow-soft" d="M704 214 C704 286, 540 294, 540 360"/>
+  <path class="arrow-soft" d="M704 214 C704 296, 222 300, 222 380"/>
+  <path class="arrow-soft" d="M792 252 C815 300, 852 326, 860 380"/>
+  <path class="arrow-soft" d="M862 252 C926 304, 1094 320, 1152 380"/>
+  <path class="arrow-soft" d="M928 252 C1034 308, 1324 320, 1410 380"/>
+
+  <path class="arrow" d="M690 433 C704 433, 720 433, 736 433"/>
+  <rect class="label-bg" x="686" y="401" width="104" height="24"/>
+  <text class="label" x="698" y="418">price/news</text>
+  <path class="arrow" d="M690 463 C818 538, 1210 535, 1320 463"/>
+  <rect class="label-bg" x="965" y="515" width="112" height="24"/>
+  <text class="label" x="977" y="532">POST /predict</text>
+  <path class="arrow" d="M690 493 C804 562, 955 560, 1028 493"/>
+  <rect class="label-bg" x="818" y="535" width="130" height="24"/>
+  <text class="label" x="830" y="552">portfolio/risk</text>
+  <path class="arrow-soft" d="M348 436 C365 436, 375 436, 390 436"/>
+  <rect class="label-bg" x="240" y="505" width="150" height="24"/>
+  <text class="label" x="252" y="522">POST /profiles</text>
+  <path class="arrow-soft" d="M1028 456 C1000 506, 920 522, 886 488"/>
+  <rect class="label-bg" x="920" y="492" width="98" height="24"/>
+  <text class="label" x="932" y="509">get prices</text>
+  <path class="arrow-soft" d="M1320 436 C1260 352, 1054 345, 986 408"/>
+  <rect class="label-bg" x="1120" y="334" width="116" height="24"/>
+  <text class="label" x="1132" y="351">latest bars</text>
+
+  <rect class="band" x="58" y="618" width="1484" height="224"/>
+  <text class="band-title" x="82" y="654">Persistence and Cache</text>
+  <rect class="card-slate" x="98" y="694" width="220" height="92"/>
+  <text class="node-title" x="122" y="724">Auth Postgres</text>
+  <text class="node-text" x="122" y="747">users, identity, provider links</text>
+  <rect class="card-slate" x="354" y="694" width="244" height="92"/>
+  <text class="node-title" x="378" y="724">Orchestration Postgres</text>
+  <text class="node-text" x="378" y="747">analysis_jobs, job_events</text>
+  <rect class="card-slate" x="634" y="694" width="232" height="92"/>
+  <text class="node-title" x="658" y="724">Data Postgres</text>
+  <text class="node-text" x="658" y="747">instruments, prices, news</text>
+  <rect class="card-slate" x="902" y="694" width="236" height="92"/>
+  <text class="node-title" x="926" y="724">Profile Postgres</text>
+  <text class="node-text" x="926" y="747">positions, transactions</text>
+  <rect class="card-slate" x="1174" y="694" width="168" height="92"/>
+  <text class="node-title" x="1198" y="724">Pattern DB</text>
+  <text class="node-text" x="1198" y="747">model metadata</text>
+  <rect class="card-teal" x="1374" y="694" width="126" height="92"/>
+  <text class="node-title" x="1398" y="724">Redis</text>
+  <text class="node-text" x="1398" y="747">cache</text>
+  <text class="node-text" x="1398" y="767">sessions</text>
+
+  <path class="arrow-soft" d="M223 488 L208 694"/>
+  <path class="arrow-soft" d="M540 508 L476 694"/>
+  <path class="arrow-soft" d="M860 488 L750 694"/>
+  <path class="arrow-soft" d="M1152 488 L1020 694"/>
+  <path class="arrow-soft" d="M1410 488 L1258 694"/>
+  <path class="arrow-soft" d="M290 488 C494 612, 1160 612, 1418 694"/>
+  <path class="arrow-soft" d="M860 488 C964 620, 1310 608, 1426 694"/>
+
+  <rect class="band" x="58" y="878" width="1484" height="120"/>
+  <text class="band-title" x="82" y="914">External Providers and Artifact Stores</text>
+  <rect class="card-teal" x="128" y="936" width="230" height="42"/>
+  <text class="node-title" x="150" y="963">Google OAuth</text>
+  <rect class="card-teal" x="468" y="936" width="270" height="42"/>
+  <text class="node-title" x="490" y="963">Yahoo Finance / Finnhub</text>
+  <rect class="card-teal" x="848" y="936" width="210" height="42"/>
+  <text class="node-title" x="870" y="963">Gemini API</text>
+  <rect class="card-teal" x="1168" y="936" width="284" height="42"/>
+  <text class="node-title" x="1190" y="963">DVC + MLflow / S3</text>
+
+  <path class="arrow-soft" d="M198 694 C180 640, 170 520, 195 488"/>
+  <path class="arrow-soft" d="M214 786 C210 850, 226 904, 242 936"/>
+  <path class="arrow-soft" d="M748 786 C710 848, 642 900, 604 936"/>
+  <path class="arrow-soft" d="M516 508 C610 704, 842 850, 952 936"/>
+  <path class="arrow-soft" d="M1258 786 C1278 846, 1300 900, 1310 936"/>
+  <path class="arrow-soft" d="M1152 488 C1188 646, 1262 820, 1310 936"/>
+</svg>
