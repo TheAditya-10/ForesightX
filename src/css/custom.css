@@ -3,10 +3,77 @@
 :root{
   --primary:#0e7490;
   --accent:#f59e0b;
-  --bg:#0b1220;
-  --muted:#7b8794;
+  --bg:#ffffff;
+  --muted:#6b7280;
   --surface:#ffffff;
   --surface-muted:#f8fafc;
+
+  /* Infima / Docusaurus variable overrides for consistent light appearance */
+  --ifm-color-primary: var(--primary);
+  --ifm-color-secondary: var(--accent);
+  --ifm-color: #0f1724;
+  --ifm-color-emphasis: #111827;
+  --ifm-background-color: var(--bg);
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-navbar-link-color: #374151;
+  --ifm-footer-background-color: #f8fafc;
+  --ifm-code-background: #f6f8fa;
+}
+
+/* Force body to follow Infima background/color variables */
+body{
+  background:var(--ifm-background-color);
+  color:var(--ifm-color);
+}
+
+/* Pleasant dark-fallback so dark mode (if somehow forced) looks acceptable */
+[data-theme='dark']{
+  --ifm-background-color:#0b1220;
+  --ifm-color:#e6eef8;
+  --ifm-navbar-background-color:#0b1220;
+  --ifm-navbar-link-color:#e2e8f0;
+  --ifm-footer-background-color:#071022;
+  --ifm-color-primary:#38bdf8;
+}
+
+/* Strong overrides to force a light layout and remove dark gutters */
+html, body, #__docusaurus, .theme-layout-main, .main-wrapper {
+  background-color: var(--ifm-background-color) !important;
+  color: var(--ifm-color) !important;
+}
+.theme-layout-navbar {
+  background: var(--ifm-navbar-background-color) !important;
+  color: var(--ifm-navbar-link-color) !important;
+  border-bottom: 1px solid rgba(15,23,36,0.04);
+}
+.theme-layout-navbar .navbar__item,
+.theme-layout-navbar .navbar__link,
+.theme-layout-navbar .navbar__title {
+  color: var(--ifm-navbar-link-color) !important;
+}
+/* hide all color mode toggles if present */
+[class*="colorModeToggle"], [aria-label*="Switch between dark and light"], .toggle_vylO { display: none !important; }
+
+/* ensure main content area uses the light background */
+.theme-layout-main .main-wrapper main,
+.container--fluid,
+.mdxPageWrapper_j9I6,
+.col--8 {
+  background: transparent !important;
+}
+
+.landing-hero{ box-shadow: 0 8px 40px rgba(12,24,40,0.04); border-radius:10px }
+.feature-grid .card{ background:var(--surface) }
+.theme-layout-footer.footer{ background:var(--ifm-footer-background-color) !important; color:var(--ifm-color) !important; border-top:1px solid rgba(15,23,36,0.04) }
+
+/* make sure any logo images render cleanly on light background */
+.navbar__brand .navbar__logo img{ filter:none !important }
+
+[data-theme='dark'] .landing-hero{
+  background:
+    radial-gradient(1200px 500px at 10% -20%, rgba(56,189,248,0.06), transparent),
+    radial-gradient(900px 400px at 90% 0%, rgba(58,64,74,0.04), transparent),
+    linear-gradient(180deg, #0b1220 0%, #071022 100%);
 }
 body{font-family:"Space Grotesk", system-ui, sans-serif;}
 .landing-hero{
@@ -28,7 +95,7 @@ body{font-family:"Space Grotesk", system-ui, sans-serif;}
 .card{background:var(--surface);border-radius:14px;padding:18px;box-shadow:0 8px 24px rgba(16,24,40,0.08);border:1px solid #eef2f7}
 .media{margin-top:32px}
 .media-grid{display:flex;gap:16px;align-items:center}
-.video-placeholder{flex:1;min-height:140px;border-radius:12px;background:#0b1220;color:white;display:flex;align-items:center;justify-content:center}
+.video-placeholder{flex:1;min-height:140px;border-radius:12px;background:#eef2f6;color:#0b1220;display:flex;align-items:center;justify-content:center}
 .diagram{width:420px;border-radius:12px}
 .links{margin-top:32px}
 .link-cards{display:flex;gap:12px;flex-wrap:wrap}
