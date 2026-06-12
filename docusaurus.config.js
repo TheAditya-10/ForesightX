@@ -4,7 +4,7 @@ module.exports = {
   title: 'ForesightX',
   tagline: 'Intelligent stock analytics, prediction, and explainable recommendations',
   url: process.env.SITE_URL || 'https://theaditya-10.github.io',
-  baseUrl: process.env.BASE_URL || '/ForesightX/',
+  baseUrl: process.env.BASE_URL || '/',
   trailingSlash: false,
   onBrokenLinks: 'throw',
   markdown: {
