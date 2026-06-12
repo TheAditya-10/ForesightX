@@ -1,19 +1,25 @@
-# ForesightX Documentation Site
+# ForesightX Documentation
 
-This folder contains a Docusaurus site that serves as the product landing page and technical documentation for ForesightX.
+Docusaurus site for the ForesightX product guide, architecture, service reference, API surface, testing evidence, and deployment documentation.
 
-Quick start (from repo root):
+## Local development
 
 ```bash
-cd website
-npm install
+npm ci
 npm run start
 ```
 
-Build for production:
+## Production build
 
 ```bash
 npm run build
+npm run serve
 ```
 
-Replace placeholders like `[GITHUB_REPO_LINK]` and `[LIVE_DEMO_LINK]` in `docusaurus.config.js` when ready.
+The default production path is `/ForesightX/` for GitHub Pages. Override deployment values when needed:
+
+```bash
+SITE_URL=https://docs.example.com BASE_URL=/ npm run build
+```
+
+Source documents live in `docs/`, homepage code in `src/pages/index.mdx`, theme rules in `src/css/custom.css`, and extracted report assets in `static/img/diagrams` and `static/img/screenshots`.

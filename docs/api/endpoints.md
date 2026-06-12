@@ -54,4 +54,4 @@ This page summarizes the public API endpoints across services. Use the OpenAPI U
 - `POST /predict`
 - `GET /health`
 
-API docs placeholder: [API_DOCS_LINK]
+Each FastAPI service publishes interactive OpenAPI documentation at its service-level `/docs` route in development. In production, expose those routes only when the access policy allows it.

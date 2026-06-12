@@ -1,76 +1,92 @@
-/**
- * Docusaurus configuration for ForesightX documentation site.
- * Replace placeholders like [GITHUB_REPO_LINK] and [LIVE_DEMO_LINK] when available.
- */
-
-const documentationUrl = process.env.DOCUMENTATION_URL;
-const navbarItems = [
-  { to: 'docs/overview', label: 'Docs', position: 'left' },
-  { to: 'docs/microservices', label: 'Microservices', position: 'left' },
-  { to: 'docs/architecture', label: 'Architecture', position: 'left' },
-  ...(documentationUrl ? [{ href: documentationUrl, label: 'Documentation', position: 'right' }] : []),
-  { href: 'https://example.com', label: 'GitHub', position: 'right' }
-];
+const githubUrl = 'https://github.com/TheAditya-10/ForesightX';
 
 module.exports = {
   title: 'ForesightX',
-  tagline: 'Predictive analytics platform for financial foresight',
-  // Replace with your production URL when ready.
-  url: 'https://example.com',
-  baseUrl: '/',
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
-  organizationName: '[GITHUB_ORG]',
-  projectName: '[GITHUB_REPO]',
+  tagline: 'Intelligent stock analytics, prediction, and explainable recommendations',
+  url: process.env.SITE_URL || 'https://theaditya-10.github.io',
+  baseUrl: process.env.BASE_URL || '/ForesightX/',
+  trailingSlash: false,
+  onBrokenLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
+  favicon: 'img/logo.svg',
+  organizationName: 'TheAditya-10',
+  projectName: 'ForesightX',
   presets: [
     [
       '@docusaurus/preset-classic',
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://example.com'
+          editUrl: `${githubUrl}/edit/main/`,
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {
-          customCss: require.resolve('./src/css/custom.css')
-        }
-      }
-    ]
+          customCss: require.resolve('./src/css/custom.css'),
+        },
+      },
+    ],
   ],
   themeConfig: {
+    image: 'img/screenshots/landing.png',
+    metadata: [
+      {name: 'theme-color', content: '#0d1211'},
+      {name: 'description', content: 'Technical documentation for the ForesightX microservice-based intelligent stock analytics platform.'},
+    ],
     colorMode: {
-      defaultMode: 'light',
-      disableSwitch: true,
-      respectPrefersColorScheme: false,
+      defaultMode: 'dark',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
     navbar: {
       title: 'ForesightX',
-      logo: {
-        alt: 'ForesightX Logo',
-        src: 'img/logo.svg'
-      },
-      items: navbarItems
+      hideOnScroll: true,
+      logo: {alt: 'ForesightX logo', src: 'img/logo.svg'},
+      items: [
+        {to: '/docs/overview', label: 'Guide', position: 'left'},
+        {to: '/docs/product-experience', label: 'Product', position: 'left'},
+        {to: '/docs/architecture', label: 'Architecture', position: 'left'},
+        {to: '/docs/microservices', label: 'Services', position: 'left'},
+        {to: '/docs/api/endpoints', label: 'API', position: 'left'},
+        {href: githubUrl, label: 'GitHub', position: 'right'},
+      ],
     },
     footer: {
-      style: 'light',
+      style: 'dark',
       links: [
         {
-          title: 'Platform',
+          title: 'Explore',
           items: [
-            { label: 'Overview', to: 'docs/overview' },
-            { label: 'Architecture', to: 'docs/architecture' }
-          ]
+            {label: 'Product overview', to: '/docs/overview'},
+            {label: 'System architecture', to: '/docs/architecture'},
+            {label: 'Application gallery', to: '/docs/product-experience'},
+          ],
         },
         {
-          title: 'Resources',
+          title: 'Build',
           items: [
-            { label: 'Roadmap', to: 'docs/roadmap' },
-            { label: 'API', to: 'docs/api/endpoints' }
-          ]
-        }
+            {label: 'Microservices', to: '/docs/microservices'},
+            {label: 'API reference', to: '/docs/api/endpoints'},
+            {label: 'Deployment', to: '/docs/devops/docker'},
+          ],
+        },
+        {
+          title: 'Project',
+          items: [
+            {label: 'Requirements', to: '/docs/requirements'},
+            {label: 'Testing', to: '/docs/testing/validation'},
+            {label: 'GitHub', href: githubUrl},
+          ],
+        },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} ForesightX`
-    }
-  }
+      copyright: `Copyright © ${new Date().getFullYear()} ForesightX. Built with Docusaurus.`,
+    },
+    prism: {
+      additionalLanguages: ['bash', 'json', 'python'],
+    },
+  },
 };

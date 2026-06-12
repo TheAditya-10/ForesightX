@@ -22,3 +22,9 @@ Notes for Pattern service:
 
 - Pull model artifacts before starting inference (`dvc pull`)
 - Configure `FORESIGHTX_ARTIFACTS_DIR` when using non-default artifact paths
+
+## Current deployment view
+
+The captured deployment contains independently running Auth, Data, Pattern, Profile, Orchestration, and Frontend applications. Production Compose adds NGINX as the single public entrypoint and Redis as a private shared dependency.
+
+![Deployed ForesightX services](/img/screenshots/deployment-services.png)

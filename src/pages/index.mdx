@@ -1,69 +1,92 @@
+---
+title: ForesightX
+description: Intelligent stock analytics, prediction, portfolio context, and explainable recommendations.
+---
+
 import React from 'react';
+import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export default function Home() {
+  const productImage = useBaseUrl('/img/screenshots/stock-analysis.png');
+
   return (
-    <main className="landing-hero">
-      <div className="container hero-inner">
-        <h1 className="hero-title">ForesightX</h1>
-        <p className="hero-sub">Production-ready predictive analytics platform for market forecasting and automated deployment.</p>
-
-        <div className="hero-ctas">
-          <a className="btn primary" href="[LIVE_DEMO_LINK]">Live demo</a>
-          <a className="btn outline" href="[GITHUB_REPO_LINK]">View repo</a>
-          <a className="btn" href="[VIDEO_DEMO_LINK]">Watch demo</a>
+    <main className="home-page">
+      <section className="home-hero">
+        <div className="home-shell home-hero-grid">
+          <div className="home-hero-copy">
+            <span className="eyebrow"><i /> Intelligent market decision support</span>
+            <h1>Market context, prediction, and reasoning in one platform.</h1>
+            <p>
+              ForesightX combines live financial data, technical indicators, ML-based forecasting,
+              portfolio context, and AI-assisted recommendations through independently deployable services.
+            </p>
+            <div className="home-actions">
+              <Link className="home-button home-button-primary" to="/docs/overview">Read the docs <span>→</span></Link>
+              <Link className="home-button home-button-secondary" to="/docs/architecture">Explore architecture</Link>
+            </div>
+            <div className="home-proof">
+              <div><strong>6</strong><span>core services</span></div>
+              <div><strong>5</strong><span>owned databases</span></div>
+              <div><strong>24/7</strong><span>market context</span></div>
+            </div>
+          </div>
+          <div className="product-frame-wrap">
+            <div className="product-glow" />
+            <div className="product-frame">
+              <div className="product-frame-bar"><span /><span /><span /><small>foresightx.app / analysis</small></div>
+              <img src={productImage} alt="ForesightX stock analysis dashboard" />
+            </div>
+          </div>
         </div>
+      </section>
 
-        <section className="features">
-          <h2>What problem we solve</h2>
-          <p>ForesightX provides a reproducible pipeline for ingesting market data, training predictive models, and serving inference in production with a microservice architecture—reducing time-to-insight for quantitative teams.</p>
+      <section className="home-section home-shell">
+        <div className="section-heading">
+          <span className="eyebrow"><i /> Platform capabilities</span>
+          <h2>From raw market feeds to an explainable recommendation.</h2>
+          <p>Each capability is isolated behind a focused service contract, making the platform easier to test, scale, and evolve.</p>
+        </div>
+        <div className="capability-grid">
+          <article><span className="card-index">01</span><h3>Market intelligence</h3><p>Live prices, historical bars, news, technical indicators, caching, and WebSocket updates.</p><Link to="/docs/microservices/foresightx-data">Data service →</Link></article>
+          <article><span className="card-index">02</span><h3>Predictive signals</h3><p>Short-horizon direction forecasts with feature engineering, confidence estimation, and tracked model artifacts.</p><Link to="/docs/microservices/foresightx-pattern">Pattern service →</Link></article>
+          <article><span className="card-index">03</span><h3>Contextual reasoning</h3><p>A LangGraph workflow combines model output, market evidence, risk context, and deterministic safeguards.</p><Link to="/docs/microservices/foresightx-orchestration">Orchestration →</Link></article>
+        </div>
+      </section>
 
-          <div className="feature-grid">
-            <div className="card">
-              <h3>Key features</h3>
-              <ul>
-                <li>Modular microservices (data, auth, profile, orchestration, ML)</li>
-                <li>Production model serving and monitoring</li>
-                <li>Containerized deployments and CI/CD</li>
-              </ul>
-            </div>
-            <div className="card">
-              <h3>Major technologies</h3>
-              <ul>
-                <li>Python (FastAPI), Postgres, Redis</li>
-                <li>ML: PyTorch, scikit-learn, DVC, MLflow</li>
-                <li>Frontend: React, Vite, Tailwind</li>
-                <li>Deployment: Docker, AWS (S3 / ECS / ECR / RDS), GitHub Actions</li>
-              </ul>
-            </div>
-            <div className="card">
-              <h3>Architecture highlights</h3>
-              <ul>
-                <li>LangGraph-based decision engine with Gemini integration</li>
-                <li>Service-owned databases with clean boundaries</li>
-                <li>Real-time data streaming for tick updates</li>
-              </ul>
-            </div>
+      <section className="home-section architecture-band">
+        <div className="home-shell architecture-grid">
+          <div>
+            <span className="eyebrow"><i /> Designed for service ownership</span>
+            <h2>A production-shaped microservice system.</h2>
+            <p>Authentication, market data, prediction, profile management, and analysis coordination own their APIs and persistence boundaries.</p>
+            <ul className="check-list">
+              <li>FastAPI services with OpenAPI contracts</li>
+              <li>PostgreSQL, Redis, MLflow, DVC, and DAGsHub</li>
+              <li>Docker Compose today, cloud orchestration ready</li>
+              <li>Same-origin API routing through NGINX</li>
+            </ul>
+            <Link className="text-link" to="/docs/design-methodology">Review the methodology <span>→</span></Link>
           </div>
-        </section>
-
-        <section className="media">
-          <h2>Demo</h2>
-          <div className="media-grid">
-            <div className="video-placeholder">Demo video placeholder — <a href="[VIDEO_DEMO_LINK]">[VIDEO_DEMO_LINK]</a></div>
-            <img src="/img/architecture.svg" alt="Architecture placeholder" className="diagram" />
+          <div className="service-map" aria-label="ForesightX service map">
+            <div className="service-node service-node-main">Orchestration<small>decision workflow</small></div>
+            <div className="service-node">Auth<small>identity & tokens</small></div>
+            <div className="service-node">Data<small>market context</small></div>
+            <div className="service-node">Pattern<small>ML inference</small></div>
+            <div className="service-node">Profile<small>portfolio & risk</small></div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="links">
-          <h2>Quick links</h2>
-          <div className="link-cards">
-            <a className="link-card" href="[LIVE_DEMO_LINK]">Live Demo</a>
-            <a className="link-card" href="[GITHUB_REPO_LINK]">GitHub Repo</a>
-            <a className="link-card" href="[API_DOCS_LINK]">API Docs</a>
-            <a className="link-card" href="[AWS_DEPLOYMENT_LINK]">AWS Deployment</a>
-          </div>
-        </section>
-      </div>
+      <section className="home-section home-shell docs-cta">
+        <span className="eyebrow"><i /> Complete project reference</span>
+        <h2>Understand the product. Trace the system. Run the stack.</h2>
+        <p>The documentation covers requirements, workflows, all service responsibilities, APIs, data ownership, testing evidence, and deployment.</p>
+        <div className="home-actions">
+          <Link className="home-button home-button-primary" to="/docs/getting-started">Get started <span>→</span></Link>
+          <Link className="home-button home-button-secondary" to="/docs/product-experience">View product screens</Link>
+        </div>
+      </section>
     </main>
   );
 }
