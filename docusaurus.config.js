@@ -1,9 +1,14 @@
 const githubUrl = 'https://github.com/TheAditya-10/ForesightX';
+const liveAppUrl = 'https://foresightx.apst.me';
+const documentationUrl = 'https://apst.me/ForesightX/';
+const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : undefined;
 
 module.exports = {
   title: 'ForesightX',
   tagline: 'Intelligent stock analytics, prediction, and explainable recommendations',
-  url: process.env.SITE_URL || 'https://theaditya-10.github.io',
+  url: process.env.SITE_URL || vercelProductionUrl || 'https://apst.me',
   baseUrl: process.env.BASE_URL || '/',
   trailingSlash: false,
   onBrokenLinks: 'throw',
@@ -52,6 +57,7 @@ module.exports = {
         {to: '/docs/architecture', label: 'Architecture', position: 'left'},
         {to: '/docs/microservices', label: 'Services', position: 'left'},
         {to: '/docs/api/endpoints', label: 'API', position: 'left'},
+        {href: liveAppUrl, label: 'Live App', position: 'right', className: 'navbar__live-app'},
         {href: githubUrl, label: 'GitHub', position: 'right'},
       ],
     },
@@ -64,6 +70,7 @@ module.exports = {
             {label: 'Product overview', to: '/docs/overview'},
             {label: 'System architecture', to: '/docs/architecture'},
             {label: 'Application gallery', to: '/docs/product-experience'},
+            {label: 'Live application', href: liveAppUrl},
           ],
         },
         {
@@ -79,6 +86,7 @@ module.exports = {
           items: [
             {label: 'Requirements', to: '/docs/requirements'},
             {label: 'Testing', to: '/docs/testing/validation'},
+            {label: 'Documentation', href: documentationUrl},
             {label: 'GitHub', href: githubUrl},
           ],
         },
