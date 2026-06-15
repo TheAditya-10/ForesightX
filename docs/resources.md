@@ -1,10 +1,15 @@
 ---
+last_update:
+  date: 2026-06-12T12:00:00.000Z
+  author: ForesightX Team
 id: resources
 title: Resources
 ---
 
 # Resources
 
+- [Open the live ForesightX application](https://foresightx.apst.me)
+- [Browse the complete documentation](https://apst.me/ForesightX/)
 - [ForesightX source repository](https://github.com/TheAditya-10/ForesightX)
 - [API endpoint reference](./api/endpoints)
 - [System architecture](./architecture)

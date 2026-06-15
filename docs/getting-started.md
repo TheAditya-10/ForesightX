@@ -1,4 +1,7 @@
 ---
+last_update:
+  date: 2026-06-12T12:00:00.000Z
+  author: ForesightX Team
 title: Getting Started
 description: Run the documentation or the complete ForesightX stack locally.
 ---

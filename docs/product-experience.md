@@ -1,4 +1,7 @@
 ---
+last_update:
+  date: 2026-06-12T12:00:00.000Z
+  author: ForesightX Team
 title: Product Experience
 description: Screens and workflows implemented in the ForesightX web application.
 ---
@@ -6,6 +9,8 @@ description: Screens and workflows implemented in the ForesightX web application
 # Product Experience
 
 The frontend uses the same visual language as this documentation: deep neutral surfaces, restrained teal accents, compact financial data, and clear hierarchy. Its main workflows are discovery, analysis, portfolio review, news, and trade-context capture.
+
+[Launch the live application](https://foresightx.apst.me) to explore these workflows directly.
 
 ## Landing and discovery
 

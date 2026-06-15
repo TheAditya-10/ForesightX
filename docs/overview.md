@@ -1,4 +1,7 @@
 ---
+last_update:
+  date: 2026-06-12T12:00:00.000Z
+  author: ForesightX Team
 id: overview
 title: Platform Overview
 description: What ForesightX solves, how it works, and where to begin.
@@ -8,6 +11,8 @@ slug: /overview
 # ForesightX
 
 ForesightX is a microservice-based intelligent stock analytics platform. It brings market data, technical indicators, short-horizon prediction, portfolio context, and recommendation generation into one workflow.
+
+**Try it:** [Open the live ForesightX application](https://foresightx.apst.me).
 
 The platform is designed as **decision support**, not as a brokerage or autonomous trading system. It helps a user understand a stock before making a personal decision and makes the evidence behind the result visible.
 
